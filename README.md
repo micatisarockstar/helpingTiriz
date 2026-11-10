@@ -230,5 +230,3 @@ Tabel detail_transaksi menjadi penghubung antara transaksi dan produk (relasi ba
 - DAO memakai Koneksi dan membuat atau membaca objek model.
 - Transaksi memiliki banyak DetailTransaksi, dan setiap DetailTransaksi merujuk ke satu Produk.
 - FormKasir membaca Sesi untuk mengisi id kasir pada transaksi.
-
-### 4.6 Fitur Utama
