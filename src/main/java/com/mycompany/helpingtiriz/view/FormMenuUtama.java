@@ -82,47 +82,52 @@ public class FormMenuUtama extends javax.swing.JFrame {
 
         lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/logo.png"))); // NOI18N
         pnlUtama.add(lblLogo);
-        lblLogo.setBounds(20, 0, 360, 101);
+        lblLogo.setBounds(20, 10, 360, 101);
 
-        lblSambutan.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
+        lblSambutan.setFont(new java.awt.Font("Segoe UI Black", 0, 14)); // NOI18N
         lblSambutan.setForeground(new java.awt.Color(46, 139, 87));
         lblSambutan.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblSambutan.setText("Welcome, Admin!");
         pnlUtama.add(lblSambutan);
-        lblSambutan.setBounds(90, 110, 189, 32);
+        lblSambutan.setBounds(90, 110, 200, 30);
 
         btnDataBarang.setBackground(new java.awt.Color(143, 188, 143));
-        btnDataBarang.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        btnDataBarang.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnDataBarang.setForeground(new java.awt.Color(255, 255, 255));
         btnDataBarang.setText("Data Barang");
         btnDataBarang.setBorderPainted(false);
         btnDataBarang.setFocusPainted(false);
         btnDataBarang.setOpaque(true);
+        btnDataBarang.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDataBarangActionPerformed(evt);
+            }
+        });
         pnlUtama.add(btnDataBarang);
-        btnDataBarang.setBounds(110, 140, 148, 34);
+        btnDataBarang.setBounds(110, 160, 160, 30);
 
         btnKasir.setBackground(new java.awt.Color(143, 188, 143));
-        btnKasir.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        btnKasir.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnKasir.setForeground(new java.awt.Color(255, 255, 255));
         btnKasir.setText("Kasir");
         btnKasir.setBorderPainted(false);
         btnKasir.setFocusPainted(false);
         btnKasir.setOpaque(true);
         pnlUtama.add(btnKasir);
-        btnKasir.setBounds(150, 220, 77, 34);
+        btnKasir.setBounds(40, 250, 80, 30);
 
         btnRiwayat.setBackground(new java.awt.Color(143, 188, 143));
-        btnRiwayat.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        btnRiwayat.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnRiwayat.setForeground(new java.awt.Color(255, 255, 255));
         btnRiwayat.setText("Riwayat Transaksi");
         btnRiwayat.setBorderPainted(false);
         btnRiwayat.setFocusPainted(false);
         btnRiwayat.setOpaque(true);
         pnlUtama.add(btnRiwayat);
-        btnRiwayat.setBounds(80, 180, 201, 34);
+        btnRiwayat.setBounds(110, 200, 160, 30);
 
         btnLogout.setBackground(new java.awt.Color(143, 188, 143));
-        btnLogout.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        btnLogout.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnLogout.setForeground(new java.awt.Color(255, 255, 255));
         btnLogout.setText("Logout");
         btnLogout.setBorderPainted(false);
@@ -134,7 +139,7 @@ public class FormMenuUtama extends javax.swing.JFrame {
             }
         });
         pnlUtama.add(btnLogout);
-        btnLogout.setBounds(120, 260, 140, 34);
+        btnLogout.setBounds(270, 250, 80, 30);
 
         getContentPane().add(pnlUtama, java.awt.BorderLayout.CENTER);
 
@@ -144,6 +149,10 @@ public class FormMenuUtama extends javax.swing.JFrame {
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnLogoutActionPerformed
+
+    private void btnDataBarangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDataBarangActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnDataBarangActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDataBarang;
