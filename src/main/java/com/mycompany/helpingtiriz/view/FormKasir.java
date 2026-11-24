@@ -459,12 +459,12 @@ private void resetInputBarang() {
         lblTopping.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblTopping.setText("Topping:");
         pnlUtama.add(lblTopping);
-        lblTopping.setBounds(160, 250, 62, 22);
+        lblTopping.setBounds(160, 250, 70, 22);
 
         cmbTopping1.setBackground(new java.awt.Color(200, 224, 200));
         cmbTopping1.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         pnlUtama.add(cmbTopping1);
-        cmbTopping1.setBounds(230, 250, 320, 27);
+        cmbTopping1.setBounds(240, 250, 280, 27);
 
         btnTambahTopping.setBackground(new java.awt.Color(143, 188, 143));
         btnTambahTopping.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -474,7 +474,7 @@ private void resetInputBarang() {
         btnTambahTopping.setFocusPainted(false);
         btnTambahTopping.setOpaque(true);
         pnlUtama.add(btnTambahTopping);
-        btnTambahTopping.setBounds(560, 250, 101, 27);
+        btnTambahTopping.setBounds(540, 270, 110, 27);
 
         cmbTopping2.setBackground(new java.awt.Color(200, 224, 200));
         cmbTopping2.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
@@ -484,17 +484,17 @@ private void resetInputBarang() {
             }
         });
         pnlUtama.add(cmbTopping2);
-        cmbTopping2.setBounds(230, 20, 320, 27);
+        cmbTopping2.setBounds(240, 290, 280, 27);
 
         lblCatatan.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblCatatan.setText("Catatan:");
         pnlUtama.add(lblCatatan);
-        lblCatatan.setBounds(10, 290, 57, 22);
+        lblCatatan.setBounds(20, 360, 70, 22);
 
         txtCatatan.setBackground(new java.awt.Color(200, 224, 200));
         txtCatatan.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         pnlUtama.add(txtCatatan);
-        txtCatatan.setBounds(80, 290, 580, 27);
+        txtCatatan.setBounds(90, 360, 560, 27);
 
         btnTambahKeranjang.setBackground(new java.awt.Color(60, 179, 113));
         btnTambahKeranjang.setFont(new java.awt.Font("Segoe UI", 1, 17)); // NOI18N
@@ -504,7 +504,7 @@ private void resetInputBarang() {
         btnTambahKeranjang.setFocusPainted(false);
         btnTambahKeranjang.setOpaque(true);
         pnlUtama.add(btnTambahKeranjang);
-        btnTambahKeranjang.setBounds(240, 350, 203, 31);
+        btnTambahKeranjang.setBounds(230, 440, 206, 31);
 
         pnlKeranjang.setBackground(new java.awt.Color(240, 255, 240));
         pnlKeranjang.setLayout(null);
