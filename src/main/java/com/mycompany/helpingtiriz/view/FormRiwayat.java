@@ -124,12 +124,12 @@ public class FormRiwayat extends javax.swing.JFrame {
         lblLogo = new javax.swing.JLabel();
         lblDaftar = new javax.swing.JLabel();
         lblFilter = new javax.swing.JLabel();
-        cmbFilter = new javax.swing.JComboBox();
-        tblTransaksi = new javax.swing.JTable();
+        cmbFilter = new javax.swing.JComboBox<>();
         spTransaksi = new javax.swing.JScrollPane();
+        tblTransaksi = new javax.swing.JTable();
         lblDetail = new javax.swing.JLabel();
-        tblDetail = new javax.swing.JTable();
         spDetail = new javax.swing.JScrollPane();
+        tblDetail = new javax.swing.JTable();
         btnTandaiSelesai = new javax.swing.JButton();
         btnKembali = new javax.swing.JButton();
 
@@ -139,29 +139,22 @@ public class FormRiwayat extends javax.swing.JFrame {
 
         pnlUtama.setBackground(new java.awt.Color(255, 255, 255));
         pnlUtama.setPreferredSize(new java.awt.Dimension(1100, 700));
-        pnlUtama.setLayout(null);
 
         lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/logo_kecil.png"))); // NOI18N
-        pnlUtama.add(lblLogo);
-        lblLogo.setBounds(20, 12, 150, 42);
 
         lblDaftar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        lblDaftar.setForeground(new java.awt.Color(0, 0, 0));
         lblDaftar.setText("Daftar Transaksi");
-        pnlUtama.add(lblDaftar);
-        lblDaftar.setBounds(20, 66, 300, 30);
 
         lblFilter.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblFilter.setForeground(new java.awt.Color(0, 0, 0));
         lblFilter.setText("Status:");
-        pnlUtama.add(lblFilter);
-        lblFilter.setBounds(800, 66, 70, 30);
 
         cmbFilter.setBackground(new java.awt.Color(200, 224, 200));
         cmbFilter.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        cmbFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Semua", "Belum", "Selesai" }));
-        pnlUtama.add(cmbFilter);
-        cmbFilter.setBounds(870, 62, 190, 36);
+        cmbFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbFilterActionPerformed(evt);
+            }
+        });
 
         tblTransaksi.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         tblTransaksi.setModel(new javax.swing.table.DefaultTableModel(
@@ -179,14 +172,9 @@ public class FormRiwayat extends javax.swing.JFrame {
         ));
         tblTransaksi.setRowHeight(26);
         spTransaksi.setViewportView(tblTransaksi);
-        pnlUtama.add(spTransaksi);
-        spTransaksi.setBounds(20, 104, 1040, 240);
 
         lblDetail.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        lblDetail.setForeground(new java.awt.Color(0, 0, 0));
         lblDetail.setText("Detail Barang");
-        pnlUtama.add(lblDetail);
-        lblDetail.setBounds(20, 358, 300, 30);
 
         tblDetail.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         tblDetail.setModel(new javax.swing.table.DefaultTableModel(
@@ -204,33 +192,100 @@ public class FormRiwayat extends javax.swing.JFrame {
         ));
         tblDetail.setRowHeight(26);
         spDetail.setViewportView(tblDetail);
-        pnlUtama.add(spDetail);
-        spDetail.setBounds(20, 394, 1040, 200);
 
         btnTandaiSelesai.setBackground(new java.awt.Color(60, 179, 113));
         btnTandaiSelesai.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
         btnTandaiSelesai.setForeground(new java.awt.Color(255, 255, 255));
+        btnTandaiSelesai.setText("Tandai Selesai");
         btnTandaiSelesai.setBorderPainted(false);
         btnTandaiSelesai.setFocusPainted(false);
         btnTandaiSelesai.setOpaque(true);
-        btnTandaiSelesai.setText("Tandai Selesai");
-        pnlUtama.add(btnTandaiSelesai);
-        btnTandaiSelesai.setBounds(20, 615, 180, 42);
+        btnTandaiSelesai.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTandaiSelesaiActionPerformed(evt);
+            }
+        });
 
         btnKembali.setBackground(new java.awt.Color(143, 188, 143));
         btnKembali.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
         btnKembali.setForeground(new java.awt.Color(255, 255, 255));
+        btnKembali.setText("Kembali");
         btnKembali.setBorderPainted(false);
         btnKembali.setFocusPainted(false);
         btnKembali.setOpaque(true);
-        btnKembali.setText("Kembali");
-        pnlUtama.add(btnKembali);
-        btnKembali.setBounds(950, 615, 110, 42);
+        btnKembali.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnKembaliActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlUtamaLayout = new javax.swing.GroupLayout(pnlUtama);
+        pnlUtama.setLayout(pnlUtamaLayout);
+        pnlUtamaLayout.setHorizontalGroup(
+            pnlUtamaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlUtamaLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(lblLogo))
+            .addGroup(pnlUtamaLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(lblDaftar)
+                .addGap(331, 331, 331)
+                .addComponent(lblFilter)
+                .addGap(4, 4, 4)
+                .addComponent(cmbFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(pnlUtamaLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(spTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 640, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(pnlUtamaLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(lblDetail))
+            .addGroup(pnlUtamaLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(spDetail, javax.swing.GroupLayout.PREFERRED_SIZE, 640, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(pnlUtamaLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(btnTandaiSelesai, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(390, 390, 390)
+                .addComponent(btnKembali))
+        );
+        pnlUtamaLayout.setVerticalGroup(
+            pnlUtamaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlUtamaLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(lblLogo)
+                .addGap(8, 8, 8)
+                .addGroup(pnlUtamaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblDaftar)
+                    .addComponent(lblFilter)
+                    .addComponent(cmbFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(13, 13, 13)
+                .addComponent(spTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
+                .addComponent(lblDetail)
+                .addGap(5, 5, 5)
+                .addComponent(spDetail, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20)
+                .addGroup(pnlUtamaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnTandaiSelesai, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnKembali)))
+        );
 
         getContentPane().add(pnlUtama, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void cmbFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbFilterActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbFilterActionPerformed
+
+    private void btnTandaiSelesaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTandaiSelesaiActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnTandaiSelesaiActionPerformed
+
+    private void btnKembaliActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKembaliActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnKembaliActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnKembali;

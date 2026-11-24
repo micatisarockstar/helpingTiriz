@@ -382,7 +382,6 @@ public class FormKasir extends javax.swing.JFrame {
         lblTopping = new javax.swing.JLabel();
         cmbTopping1 = new javax.swing.JComboBox<>();
         btnTambahTopping = new javax.swing.JButton();
-        cmbTopping2 = new javax.swing.JComboBox<>();
         lblCatatan = new javax.swing.JLabel();
         txtCatatan = new javax.swing.JTextField();
         btnTambahKeranjang = new javax.swing.JButton();
@@ -412,27 +411,32 @@ public class FormKasir extends javax.swing.JFrame {
 
         lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/logo_kecil.png"))); // NOI18N
         pnlUtama.add(lblLogo);
-        lblLogo.setBounds(0, 0, 150, 42);
+        lblLogo.setBounds(10, 10, 150, 42);
 
         lblCari.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblCari.setText("Cari (Kode/Nama) :");
         pnlUtama.add(lblCari);
-        lblCari.setBounds(0, 0, 134, 22);
+        lblCari.setBounds(10, 60, 132, 22);
 
         txtCari.setBackground(new java.awt.Color(200, 224, 200));
         txtCari.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        txtCari.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtCariActionPerformed(evt);
+            }
+        });
         pnlUtama.add(txtCari);
-        txtCari.setBounds(0, 0, 64, 27);
+        txtCari.setBounds(150, 60, 390, 27);
 
         btnCari.setBackground(new java.awt.Color(143, 188, 143));
         btnCari.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnCari.setForeground(new java.awt.Color(255, 255, 255));
+        btnCari.setText("Cari");
         btnCari.setBorderPainted(false);
         btnCari.setFocusPainted(false);
         btnCari.setOpaque(true);
-        btnCari.setText("Cari");
         pnlUtama.add(btnCari);
-        btnCari.setBounds(0, 0, 72, 27);
+        btnCari.setBounds(560, 60, 72, 27);
 
         tblProduk.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         tblProduk.setModel(new javax.swing.table.DefaultTableModel(
@@ -452,61 +456,56 @@ public class FormKasir extends javax.swing.JFrame {
         spProduk.setViewportView(tblProduk);
 
         pnlUtama.add(spProduk);
-        spProduk.setBounds(0, 0, 452, 402);
+        spProduk.setBounds(10, 100, 650, 140);
 
         lblJumlah.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblJumlah.setText("Jumlah:");
         pnlUtama.add(lblJumlah);
-        lblJumlah.setBounds(0, 0, 54, 22);
+        lblJumlah.setBounds(10, 250, 53, 22);
 
         spnJumlah.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         pnlUtama.add(spnJumlah);
-        spnJumlah.setBounds(0, 0, 64, 27);
+        spnJumlah.setBounds(70, 250, 64, 27);
 
         lblTopping.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblTopping.setText("Topping:");
         pnlUtama.add(lblTopping);
-        lblTopping.setBounds(0, 0, 63, 22);
+        lblTopping.setBounds(160, 250, 60, 22);
 
         cmbTopping1.setBackground(new java.awt.Color(200, 224, 200));
         cmbTopping1.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         pnlUtama.add(cmbTopping1);
-        cmbTopping1.setBounds(0, 0, 72, 27);
+        cmbTopping1.setBounds(230, 250, 320, 27);
 
         btnTambahTopping.setBackground(new java.awt.Color(143, 188, 143));
         btnTambahTopping.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnTambahTopping.setForeground(new java.awt.Color(255, 255, 255));
+        btnTambahTopping.setText("+ Topping");
         btnTambahTopping.setBorderPainted(false);
         btnTambahTopping.setFocusPainted(false);
         btnTambahTopping.setOpaque(true);
-        btnTambahTopping.setText("+ Topping");
         pnlUtama.add(btnTambahTopping);
-        btnTambahTopping.setBounds(0, 0, 99, 27);
-
-        cmbTopping2.setBackground(new java.awt.Color(200, 224, 200));
-        cmbTopping2.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        pnlUtama.add(cmbTopping2);
-        cmbTopping2.setBounds(0, 0, 72, 27);
+        btnTambahTopping.setBounds(560, 250, 100, 27);
 
         lblCatatan.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblCatatan.setText("Catatan:");
         pnlUtama.add(lblCatatan);
-        lblCatatan.setBounds(0, 0, 57, 22);
+        lblCatatan.setBounds(10, 290, 56, 22);
 
         txtCatatan.setBackground(new java.awt.Color(200, 224, 200));
         txtCatatan.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         pnlUtama.add(txtCatatan);
-        txtCatatan.setBounds(0, 0, 64, 27);
+        txtCatatan.setBounds(80, 290, 580, 27);
 
         btnTambahKeranjang.setBackground(new java.awt.Color(60, 179, 113));
         btnTambahKeranjang.setFont(new java.awt.Font("Segoe UI", 1, 17)); // NOI18N
         btnTambahKeranjang.setForeground(new java.awt.Color(255, 255, 255));
+        btnTambahKeranjang.setText("Tambah Ke Keranjang");
         btnTambahKeranjang.setBorderPainted(false);
         btnTambahKeranjang.setFocusPainted(false);
         btnTambahKeranjang.setOpaque(true);
-        btnTambahKeranjang.setText("Tambah Ke Keranjang");
         pnlUtama.add(btnTambahKeranjang);
-        btnTambahKeranjang.setBounds(0, 0, 209, 31);
+        btnTambahKeranjang.setBounds(240, 350, 206, 31);
 
         pnlKeranjang.setBackground(new java.awt.Color(240, 255, 240));
         pnlKeranjang.setLayout(null);
@@ -539,7 +538,7 @@ public class FormKasir extends javax.swing.JFrame {
         btnHapusItem.setOpaque(true);
         btnHapusItem.setText("Hapus Item");
         pnlKeranjang.add(btnHapusItem);
-        btnHapusItem.setBounds(0, 0, 105, 27);
+        btnHapusItem.setBounds(0, 0, 106, 27);
 
         btnKosongkan.setBackground(new java.awt.Color(143, 188, 143));
         btnKosongkan.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -554,7 +553,7 @@ public class FormKasir extends javax.swing.JFrame {
         lblTotal.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblTotal.setText("Total");
         pnlKeranjang.add(lblTotal);
-        lblTotal.setBounds(0, 0, 35, 22);
+        lblTotal.setBounds(0, 0, 34, 22);
 
         txtTotal.setEditable(false);
         txtTotal.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
@@ -564,7 +563,7 @@ public class FormKasir extends javax.swing.JFrame {
         lblMetode.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblMetode.setText("Metode Pembayaran");
         pnlKeranjang.add(lblMetode);
-        lblMetode.setBounds(0, 0, 148, 22);
+        lblMetode.setBounds(0, 0, 144, 22);
 
         cmbMetode.setBackground(new java.awt.Color(200, 224, 200));
         cmbMetode.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
@@ -574,7 +573,7 @@ public class FormKasir extends javax.swing.JFrame {
         lblUangBayar.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblUangBayar.setText("Uang Bayar");
         pnlKeranjang.add(lblUangBayar);
-        lblUangBayar.setBounds(0, 0, 81, 22);
+        lblUangBayar.setBounds(0, 0, 80, 22);
 
         txtUangBayar.setBackground(new java.awt.Color(200, 224, 200));
         txtUangBayar.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
@@ -584,7 +583,7 @@ public class FormKasir extends javax.swing.JFrame {
         lblKembalian.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblKembalian.setText("Kembalian");
         pnlKeranjang.add(lblKembalian);
-        lblKembalian.setBounds(0, 0, 75, 22);
+        lblKembalian.setBounds(0, 0, 73, 22);
 
         txtKembalian.setEditable(false);
         txtKembalian.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
@@ -609,7 +608,7 @@ public class FormKasir extends javax.swing.JFrame {
         btnKembali.setOpaque(true);
         btnKembali.setText("Kembali");
         pnlKeranjang.add(btnKembali);
-        btnKembali.setBounds(0, 0, 92, 29);
+        btnKembali.setBounds(0, 0, 93, 29);
 
         pnlUtama.add(pnlKeranjang);
         pnlKeranjang.setBounds(0, 0, 0, 0);
@@ -618,6 +617,10 @@ public class FormKasir extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void txtCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCariActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCariActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCari;
@@ -629,7 +632,6 @@ public class FormKasir extends javax.swing.JFrame {
     private javax.swing.JButton btnTambahTopping;
     private javax.swing.JComboBox<String> cmbMetode;
     private javax.swing.JComboBox<String> cmbTopping1;
-    private javax.swing.JComboBox<String> cmbTopping2;
     private javax.swing.JLabel lblCari;
     private javax.swing.JLabel lblCatatan;
     private javax.swing.JLabel lblJumlah;
