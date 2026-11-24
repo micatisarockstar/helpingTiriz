@@ -275,12 +275,12 @@ public class FormProduk extends javax.swing.JFrame {
         lblCari = new javax.swing.JLabel();
         txtCari = new javax.swing.JTextField();
         btnCari = new javax.swing.JButton();
-        tblProduk = new javax.swing.JTable();
         spProduk = new javax.swing.JScrollPane();
+        tblProduk = new javax.swing.JTable();
         lblKode = new javax.swing.JLabel();
         txtKode = new javax.swing.JTextField();
         lblKategori = new javax.swing.JLabel();
-        cmbKategori = new javax.swing.JComboBox();
+        cmbKategori = new javax.swing.JComboBox<>();
         lblHarga = new javax.swing.JLabel();
         txtHarga = new javax.swing.JTextField();
         lblStokMin = new javax.swing.JLabel();
@@ -288,7 +288,7 @@ public class FormProduk extends javax.swing.JFrame {
         lblNama = new javax.swing.JLabel();
         txtNama = new javax.swing.JTextField();
         lblUkuran = new javax.swing.JLabel();
-        cmbUkuran = new javax.swing.JComboBox();
+        cmbUkuran = new javax.swing.JComboBox<>();
         lblStok = new javax.swing.JLabel();
         txtStok = new javax.swing.JTextField();
         btnTambah = new javax.swing.JButton();
@@ -309,28 +309,27 @@ public class FormProduk extends javax.swing.JFrame {
 
         lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/logo_kecil.png"))); // NOI18N
         pnlUtama.add(lblLogo);
-        lblLogo.setBounds(20, 12, 150, 42);
+        lblLogo.setBounds(10, 10, 150, 42);
 
         lblCari.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblCari.setForeground(new java.awt.Color(0, 0, 0));
         lblCari.setText("Cari (Kode/Nama) :");
         pnlUtama.add(lblCari);
-        lblCari.setBounds(20, 72, 170, 34);
+        lblCari.setBounds(20, 60, 132, 22);
 
         txtCari.setBackground(new java.awt.Color(200, 224, 200));
         txtCari.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         pnlUtama.add(txtCari);
-        txtCari.setBounds(190, 70, 300, 36);
+        txtCari.setBounds(160, 60, 280, 27);
 
         btnCari.setBackground(new java.awt.Color(143, 188, 143));
         btnCari.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnCari.setForeground(new java.awt.Color(255, 255, 255));
+        btnCari.setText("Cari");
         btnCari.setBorderPainted(false);
         btnCari.setFocusPainted(false);
         btnCari.setOpaque(true);
-        btnCari.setText("Cari");
         pnlUtama.add(btnCari);
-        btnCari.setBounds(500, 70, 90, 36);
+        btnCari.setBounds(460, 60, 72, 27);
 
         tblProduk.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         tblProduk.setModel(new javax.swing.table.DefaultTableModel(
@@ -348,158 +347,176 @@ public class FormProduk extends javax.swing.JFrame {
         ));
         tblProduk.setRowHeight(26);
         spProduk.setViewportView(tblProduk);
+
         pnlUtama.add(spProduk);
-        spProduk.setBounds(20, 118, 1060, 225);
+        spProduk.setBounds(20, 100, 690, 150);
 
         lblKode.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblKode.setForeground(new java.awt.Color(0, 0, 0));
         lblKode.setText("Kode");
         pnlUtama.add(lblKode);
-        lblKode.setBounds(60, 372, 130, 30);
+        lblKode.setBounds(50, 260, 35, 22);
 
         txtKode.setBackground(new java.awt.Color(200, 224, 200));
         txtKode.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         pnlUtama.add(txtKode);
-        txtKode.setBounds(200, 368, 270, 36);
+        txtKode.setBounds(170, 260, 170, 27);
 
         lblKategori.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblKategori.setForeground(new java.awt.Color(0, 0, 0));
         lblKategori.setText("Kategori");
         pnlUtama.add(lblKategori);
-        lblKategori.setBounds(60, 417, 130, 30);
+        lblKategori.setBounds(50, 300, 58, 22);
 
         cmbKategori.setBackground(new java.awt.Color(200, 224, 200));
         cmbKategori.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        cmbKategori.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Minuman", "Makanan", "Topping" }));
+        cmbKategori.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbKategoriActionPerformed(evt);
+            }
+        });
         pnlUtama.add(cmbKategori);
-        cmbKategori.setBounds(200, 413, 270, 36);
+        cmbKategori.setBounds(170, 300, 170, 27);
 
         lblHarga.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblHarga.setForeground(new java.awt.Color(0, 0, 0));
         lblHarga.setText("Harga");
         pnlUtama.add(lblHarga);
-        lblHarga.setBounds(60, 462, 130, 30);
+        lblHarga.setBounds(50, 340, 42, 22);
 
         txtHarga.setBackground(new java.awt.Color(200, 224, 200));
         txtHarga.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        txtHarga.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtHargaActionPerformed(evt);
+            }
+        });
         pnlUtama.add(txtHarga);
-        txtHarga.setBounds(200, 458, 270, 36);
+        txtHarga.setBounds(170, 340, 170, 27);
 
         lblStokMin.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblStokMin.setForeground(new java.awt.Color(0, 0, 0));
         lblStokMin.setText("Stok Minimum");
         pnlUtama.add(lblStokMin);
-        lblStokMin.setBounds(60, 507, 130, 30);
+        lblStokMin.setBounds(50, 380, 103, 22);
 
         txtStokMin.setBackground(new java.awt.Color(200, 224, 200));
         txtStokMin.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         pnlUtama.add(txtStokMin);
-        txtStokMin.setBounds(200, 503, 270, 36);
+        txtStokMin.setBounds(170, 380, 170, 27);
 
         lblNama.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblNama.setForeground(new java.awt.Color(0, 0, 0));
         lblNama.setText("Nama");
         pnlUtama.add(lblNama);
-        lblNama.setBounds(540, 372, 100, 30);
+        lblNama.setBounds(380, 260, 42, 22);
 
         txtNama.setBackground(new java.awt.Color(200, 224, 200));
         txtNama.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         pnlUtama.add(txtNama);
-        txtNama.setBounds(650, 368, 300, 36);
+        txtNama.setBounds(460, 260, 160, 27);
 
         lblUkuran.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblUkuran.setForeground(new java.awt.Color(0, 0, 0));
         lblUkuran.setText("Ukuran");
         pnlUtama.add(lblUkuran);
-        lblUkuran.setBounds(540, 417, 100, 30);
+        lblUkuran.setBounds(380, 300, 51, 22);
 
         cmbUkuran.setBackground(new java.awt.Color(200, 224, 200));
         cmbUkuran.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        cmbUkuran.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-", "S", "M", "L" }));
         pnlUtama.add(cmbUkuran);
-        cmbUkuran.setBounds(650, 413, 300, 36);
+        cmbUkuran.setBounds(460, 300, 160, 27);
 
         lblStok.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblStok.setForeground(new java.awt.Color(0, 0, 0));
         lblStok.setText("Stok");
         pnlUtama.add(lblStok);
-        lblStok.setBounds(540, 462, 100, 30);
+        lblStok.setBounds(380, 340, 31, 22);
 
         txtStok.setBackground(new java.awt.Color(200, 224, 200));
         txtStok.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         pnlUtama.add(txtStok);
-        txtStok.setBounds(650, 458, 300, 36);
+        txtStok.setBounds(460, 340, 160, 27);
 
         btnTambah.setBackground(new java.awt.Color(60, 179, 113));
         btnTambah.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnTambah.setForeground(new java.awt.Color(255, 255, 255));
+        btnTambah.setText("Tambah");
         btnTambah.setBorderPainted(false);
         btnTambah.setFocusPainted(false);
         btnTambah.setOpaque(true);
-        btnTambah.setText("Tambah");
+        btnTambah.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTambahActionPerformed(evt);
+            }
+        });
         pnlUtama.add(btnTambah);
-        btnTambah.setBounds(60, 570, 110, 42);
+        btnTambah.setBounds(20, 430, 84, 27);
 
         btnUbah.setBackground(new java.awt.Color(143, 188, 143));
         btnUbah.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnUbah.setForeground(new java.awt.Color(255, 255, 255));
+        btnUbah.setText("Ubah");
         btnUbah.setBorderPainted(false);
         btnUbah.setFocusPainted(false);
         btnUbah.setOpaque(true);
-        btnUbah.setText("Ubah");
         pnlUtama.add(btnUbah);
-        btnUbah.setBounds(185, 570, 110, 42);
+        btnUbah.setBounds(110, 430, 72, 27);
 
         btnHapus.setBackground(new java.awt.Color(143, 188, 143));
         btnHapus.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnHapus.setForeground(new java.awt.Color(255, 255, 255));
+        btnHapus.setText("Hapus");
         btnHapus.setBorderPainted(false);
         btnHapus.setFocusPainted(false);
         btnHapus.setOpaque(true);
-        btnHapus.setText("Hapus");
         pnlUtama.add(btnHapus);
-        btnHapus.setBounds(310, 570, 110, 42);
+        btnHapus.setBounds(190, 430, 72, 27);
 
         btnTambahStok.setBackground(new java.awt.Color(143, 188, 143));
         btnTambahStok.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnTambahStok.setForeground(new java.awt.Color(255, 255, 255));
+        btnTambahStok.setText("Tambah Stok");
         btnTambahStok.setBorderPainted(false);
         btnTambahStok.setFocusPainted(false);
         btnTambahStok.setOpaque(true);
-        btnTambahStok.setText("Tambah Stok");
         pnlUtama.add(btnTambahStok);
-        btnTambahStok.setBounds(435, 570, 140, 42);
+        btnTambahStok.setBounds(270, 430, 118, 27);
 
         btnBersihkan.setBackground(new java.awt.Color(143, 188, 143));
         btnBersihkan.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnBersihkan.setForeground(new java.awt.Color(255, 255, 255));
+        btnBersihkan.setText("Bersihkan");
         btnBersihkan.setBorderPainted(false);
         btnBersihkan.setFocusPainted(false);
         btnBersihkan.setOpaque(true);
-        btnBersihkan.setText("Bersihkan");
         pnlUtama.add(btnBersihkan);
-        btnBersihkan.setBounds(590, 570, 120, 42);
+        btnBersihkan.setBounds(400, 430, 95, 27);
 
         btnKembali.setBackground(new java.awt.Color(143, 188, 143));
         btnKembali.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnKembali.setForeground(new java.awt.Color(255, 255, 255));
+        btnKembali.setText("Kembali");
         btnKembali.setBorderPainted(false);
         btnKembali.setFocusPainted(false);
         btnKembali.setOpaque(true);
-        btnKembali.setText("Kembali");
         pnlUtama.add(btnKembali);
-        btnKembali.setBounds(970, 570, 110, 42);
+        btnKembali.setBounds(600, 430, 85, 27);
 
         lblKeterangan.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
-        lblKeterangan.setForeground(new java.awt.Color(0, 0, 0));
         lblKeterangan.setText("Baris merah muda = stok menipis (di batas minimum atau kurang)");
         pnlUtama.add(lblKeterangan);
-        lblKeterangan.setBounds(60, 625, 700, 24);
+        lblKeterangan.setBounds(20, 460, 385, 18);
 
         getContentPane().add(pnlUtama, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnTambahActionPerformed
+
+    private void txtHargaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtHargaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtHargaActionPerformed
+
+    private void cmbKategoriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbKategoriActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbKategoriActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBersihkan;
