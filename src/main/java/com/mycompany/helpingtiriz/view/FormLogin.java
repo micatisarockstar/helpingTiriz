@@ -83,17 +83,17 @@ public class FormLogin extends javax.swing.JFrame {
         pnlUtama.add(lblLogo);
         lblLogo.setBounds(120, 0, 360, 101);
 
-        lblTagline.setFont(new java.awt.Font("Segoe UI", 0, 22)); // NOI18N
+        lblTagline.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
         lblTagline.setForeground(new java.awt.Color(46, 139, 87));
         lblTagline.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblTagline.setText("fill ydjedhdsedbajb yah");
+        lblTagline.setText("Your day with peace, love, and TIRIZ");
         pnlUtama.add(lblTagline);
-        lblTagline.setBounds(20, 80, 351, 30);
+        lblTagline.setBounds(20, 80, 351, 20);
 
         lblUsername.setFont(new java.awt.Font("Segoe UI", 0, 17)); // NOI18N
         lblUsername.setText("Username");
         pnlUtama.add(lblUsername);
-        lblUsername.setBounds(10, 130, 77, 24);
+        lblUsername.setBounds(10, 130, 74, 24);
 
         txtUsername.setBackground(new java.awt.Color(200, 224, 200));
         txtUsername.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
