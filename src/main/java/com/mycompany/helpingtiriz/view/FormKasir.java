@@ -51,7 +51,7 @@ public class FormKasir extends javax.swing.JFrame {
         cmbMetode.setModel(new DefaultComboBoxModel<>(new String[]{"Tunai", "QRIS", "Transfer"}));
         txtTotal.setEditable(false);
         txtKembalian.setEditable(false);
-        cmbTopping2.setVisible(false);                   // baru muncul setelah "+ Topping" ditekan
+        cmbTopping1.setVisible(false);                   // Diperbaiki dari cmbToppin1
 
         pasangEvent();
         muatTopping();
@@ -70,7 +70,7 @@ public class FormKasir extends javax.swing.JFrame {
         });
 
         btnTambahTopping.addActionListener(e -> {
-            cmbTopping2.setVisible(true);
+            cmbTopping1.setVisible(true);
             btnTambahTopping.setEnabled(false);          // maksimal 2 topping gratis
         });
         btnTambahKeranjang.addActionListener(e -> tambahKeKeranjang());
@@ -96,7 +96,7 @@ public class FormKasir extends javax.swing.JFrame {
 
     // ---------------- keranjang ----------------
 
-    private void tambahKeKeranjang() {
+   private void tambahKeKeranjang() {
         Produk p = produkTerpilih();
         if (p == null) {
             peringatan("Pilih barang di tabel terlebih dahulu.");
@@ -115,21 +115,14 @@ public class FormKasir extends javax.swing.JFrame {
             return;                                      // barang TIDAK masuk keranjang
         }
 
-        String topping1 = cmbTopping1.getSelectedIndex() > 0 ? (String) cmbTopping1.getSelectedItem() : null;
-        String topping2 = (cmbTopping2.isVisible() && cmbTopping2.getSelectedIndex() > 0)
-                ? (String) cmbTopping2.getSelectedItem() : null;
-        if (topping1 != null && topping1.equals(topping2)) {
-            peringatan("Topping pertama dan kedua tidak boleh sama.");
-            return;
-        }
+        // Ambil 1 topping saja (pastikan hanya menggunakan cmbTopping1)
+        String topping = (cmbTopping1.isVisible() && cmbTopping1.getSelectedIndex() > 0)
+                ? (String) cmbTopping1.getSelectedItem() : null;
 
-        // catatan = "Topping: Oreo, Sprinkle | catatan bebas"
+        // Catatan = "Topping: Caramel Crumble | catatan bebas"
         List<String> bagian = new ArrayList<>();
-        List<String> daftarTopping = new ArrayList<>();
-        if (topping1 != null) daftarTopping.add(topping1);
-        if (topping2 != null) daftarTopping.add(topping2);
-        if (!daftarTopping.isEmpty()) {
-            bagian.add("Topping: " + String.join(", ", daftarTopping));
+        if (topping != null) {
+            bagian.add("Topping: " + topping);
         }
         if (!txtCatatan.getText().trim().isEmpty()) {
             bagian.add(txtCatatan.getText().trim());
@@ -150,8 +143,8 @@ public class FormKasir extends javax.swing.JFrame {
         perbaruiTotal();
         resetInputBarang();
     }
-
-    private void hapusItem() {
+   
+   private void hapusItem() {
         int baris = tblKeranjang.getSelectedRow();
         if (baris < 0) {
             peringatan("Pilih baris di keranjang yang akan dihapus.");
@@ -304,42 +297,37 @@ public class FormKasir extends javax.swing.JFrame {
     }
 
     private void muatTopping() {
-        try {
-            List<String> nama = new ArrayList<>();
-            nama.add(TANPA_TOPPING);
-            for (Produk p : produkDAO.ambilTopping()) {
-                nama.add(p.getNamaProduk());
-            }
-            cmbTopping1.setModel(new DefaultComboBoxModel<>(nama.toArray(new String[0])));
-            cmbTopping2.setModel(new DefaultComboBoxModel<>(nama.toArray(new String[0])));
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Gagal memuat topping:\n" + ex.getMessage(),
-                    "Error Database", JOptionPane.ERROR_MESSAGE);
+    try {
+        List<String> nama = new ArrayList<>();
+        nama.add(TANPA_TOPPING);
+        for (Produk p : produkDAO.ambilTopping()) {
+            nama.add(p.getNamaProduk());
         }
+        cmbTopping1.setModel(new DefaultComboBoxModel<>(nama.toArray(new String[0])));
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(this, "Gagal memuat topping:\n" + ex.getMessage(),
+                "Error Database", JOptionPane.ERROR_MESSAGE);
     }
+}
 
-    /** Topping hanya berlaku untuk Minuman. */
     private void aturTopping() {
-        Produk p = produkTerpilih();
-        boolean minuman = p != null && "Minuman".equals(p.getKategori());
-        cmbTopping1.setEnabled(minuman);
-        cmbTopping2.setEnabled(minuman);
-        btnTambahTopping.setEnabled(minuman && !cmbTopping2.isVisible());
-        if (!minuman) {
-            cmbTopping1.setSelectedIndex(0);
-            cmbTopping2.setSelectedIndex(0);
-            cmbTopping2.setVisible(false);
-        }
-    }
-
-    private void resetInputBarang() {
-        spnJumlah.setValue(1);
+    Produk p = produkTerpilih();
+    boolean minuman = p != null && "Minuman".equals(p.getKategori());
+    cmbTopping1.setEnabled(minuman);
+    btnTambahTopping.setEnabled(minuman && !cmbTopping1.isVisible());
+    if (!minuman) {
         cmbTopping1.setSelectedIndex(0);
-        cmbTopping2.setSelectedIndex(0);
-        cmbTopping2.setVisible(false);
-        txtCatatan.setText("");
-        aturTopping();
+        cmbTopping1.setVisible(false);
     }
+}
+
+private void resetInputBarang() {
+    spnJumlah.setValue(1);
+    cmbTopping1.setSelectedIndex(0);
+    cmbTopping1.setVisible(false);
+    txtCatatan.setText("");
+    aturTopping();
+}
 
     private Produk produkTerpilih() {
         int baris = tblProduk.getSelectedRow();
