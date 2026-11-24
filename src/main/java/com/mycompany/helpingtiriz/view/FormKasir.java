@@ -405,7 +405,7 @@ private void resetInputBarang() {
         lblCari.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblCari.setText("Cari (Kode/Nama) :");
         pnlUtama.add(lblCari);
-        lblCari.setBounds(10, 60, 132, 22);
+        lblCari.setBounds(10, 60, 133, 22);
 
         txtCari.setBackground(new java.awt.Color(200, 224, 200));
         txtCari.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
@@ -450,7 +450,7 @@ private void resetInputBarang() {
         lblJumlah.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblJumlah.setText("Jumlah:");
         pnlUtama.add(lblJumlah);
-        lblJumlah.setBounds(10, 250, 53, 22);
+        lblJumlah.setBounds(10, 250, 52, 22);
 
         spnJumlah.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         pnlUtama.add(spnJumlah);
@@ -459,7 +459,7 @@ private void resetInputBarang() {
         lblTopping.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblTopping.setText("Topping:");
         pnlUtama.add(lblTopping);
-        lblTopping.setBounds(160, 250, 60, 22);
+        lblTopping.setBounds(160, 250, 62, 22);
 
         cmbTopping1.setBackground(new java.awt.Color(200, 224, 200));
         cmbTopping1.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
@@ -474,7 +474,7 @@ private void resetInputBarang() {
         btnTambahTopping.setFocusPainted(false);
         btnTambahTopping.setOpaque(true);
         pnlUtama.add(btnTambahTopping);
-        btnTambahTopping.setBounds(560, 250, 100, 27);
+        btnTambahTopping.setBounds(560, 250, 101, 27);
 
         cmbTopping2.setBackground(new java.awt.Color(200, 224, 200));
         cmbTopping2.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
@@ -489,7 +489,7 @@ private void resetInputBarang() {
         lblCatatan.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblCatatan.setText("Catatan:");
         pnlUtama.add(lblCatatan);
-        lblCatatan.setBounds(10, 290, 56, 22);
+        lblCatatan.setBounds(10, 290, 57, 22);
 
         txtCatatan.setBackground(new java.awt.Color(200, 224, 200));
         txtCatatan.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
@@ -504,7 +504,7 @@ private void resetInputBarang() {
         btnTambahKeranjang.setFocusPainted(false);
         btnTambahKeranjang.setOpaque(true);
         pnlUtama.add(btnTambahKeranjang);
-        btnTambahKeranjang.setBounds(240, 350, 206, 31);
+        btnTambahKeranjang.setBounds(240, 350, 203, 31);
 
         pnlKeranjang.setBackground(new java.awt.Color(240, 255, 240));
         pnlKeranjang.setLayout(null);
@@ -527,90 +527,95 @@ private void resetInputBarang() {
         spKeranjang.setViewportView(tblKeranjang);
 
         pnlKeranjang.add(spKeranjang);
-        spKeranjang.setBounds(0, 0, 452, 402);
+        spKeranjang.setBounds(30, 20, 490, 150);
 
         btnHapusItem.setBackground(new java.awt.Color(143, 188, 143));
         btnHapusItem.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnHapusItem.setForeground(new java.awt.Color(255, 255, 255));
+        btnHapusItem.setText("Hapus Item");
         btnHapusItem.setBorderPainted(false);
         btnHapusItem.setFocusPainted(false);
         btnHapusItem.setOpaque(true);
-        btnHapusItem.setText("Hapus Item");
         pnlKeranjang.add(btnHapusItem);
-        btnHapusItem.setBounds(0, 0, 106, 27);
+        btnHapusItem.setBounds(40, 190, 130, 27);
 
         btnKosongkan.setBackground(new java.awt.Color(143, 188, 143));
         btnKosongkan.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnKosongkan.setForeground(new java.awt.Color(255, 255, 255));
+        btnKosongkan.setText("Kosongkan");
         btnKosongkan.setBorderPainted(false);
         btnKosongkan.setFocusPainted(false);
         btnKosongkan.setOpaque(true);
-        btnKosongkan.setText("Kosongkan");
         pnlKeranjang.add(btnKosongkan);
-        btnKosongkan.setBounds(0, 0, 104, 27);
+        btnKosongkan.setBounds(190, 190, 130, 27);
 
         lblTotal.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblTotal.setText("Total");
         pnlKeranjang.add(lblTotal);
-        lblTotal.setBounds(0, 0, 34, 22);
+        lblTotal.setBounds(40, 250, 60, 22);
 
         txtTotal.setEditable(false);
         txtTotal.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        txtTotal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtTotalActionPerformed(evt);
+            }
+        });
         pnlKeranjang.add(txtTotal);
-        txtTotal.setBounds(0, 0, 64, 28);
+        txtTotal.setBounds(200, 250, 320, 28);
 
         lblMetode.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblMetode.setText("Metode Pembayaran");
         pnlKeranjang.add(lblMetode);
-        lblMetode.setBounds(0, 0, 144, 22);
+        lblMetode.setBounds(40, 300, 150, 22);
 
         cmbMetode.setBackground(new java.awt.Color(200, 224, 200));
         cmbMetode.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         pnlKeranjang.add(cmbMetode);
-        cmbMetode.setBounds(0, 0, 72, 27);
+        cmbMetode.setBounds(200, 300, 320, 27);
 
         lblUangBayar.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblUangBayar.setText("Uang Bayar");
         pnlKeranjang.add(lblUangBayar);
-        lblUangBayar.setBounds(0, 0, 80, 22);
+        lblUangBayar.setBounds(40, 350, 80, 22);
 
         txtUangBayar.setBackground(new java.awt.Color(200, 224, 200));
         txtUangBayar.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         pnlKeranjang.add(txtUangBayar);
-        txtUangBayar.setBounds(0, 0, 64, 28);
+        txtUangBayar.setBounds(200, 350, 320, 28);
 
         lblKembalian.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblKembalian.setText("Kembalian");
         pnlKeranjang.add(lblKembalian);
-        lblKembalian.setBounds(0, 0, 73, 22);
+        lblKembalian.setBounds(40, 400, 90, 22);
 
         txtKembalian.setEditable(false);
         txtKembalian.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         pnlKeranjang.add(txtKembalian);
-        txtKembalian.setBounds(0, 0, 64, 28);
+        txtKembalian.setBounds(200, 400, 320, 28);
 
         btnCetak.setBackground(new java.awt.Color(60, 179, 113));
         btnCetak.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnCetak.setForeground(new java.awt.Color(255, 255, 255));
+        btnCetak.setText("Cetak Transaksi");
         btnCetak.setBorderPainted(false);
         btnCetak.setFocusPainted(false);
         btnCetak.setOpaque(true);
-        btnCetak.setText("Cetak Transaksi");
         pnlKeranjang.add(btnCetak);
-        btnCetak.setBounds(0, 0, 163, 32);
+        btnCetak.setBounds(50, 460, 330, 32);
 
         btnKembali.setBackground(new java.awt.Color(143, 188, 143));
         btnKembali.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         btnKembali.setForeground(new java.awt.Color(255, 255, 255));
+        btnKembali.setText("Kembali");
         btnKembali.setBorderPainted(false);
         btnKembali.setFocusPainted(false);
         btnKembali.setOpaque(true);
-        btnKembali.setText("Kembali");
         pnlKeranjang.add(btnKembali);
-        btnKembali.setBounds(0, 0, 93, 29);
+        btnKembali.setBounds(420, 460, 93, 29);
 
         pnlUtama.add(pnlKeranjang);
-        pnlKeranjang.setBounds(0, 0, 0, 0);
+        pnlKeranjang.setBounds(670, 10, 590, 620);
 
         getContentPane().add(pnlUtama, java.awt.BorderLayout.CENTER);
 
@@ -624,6 +629,10 @@ private void resetInputBarang() {
     private void cmbTopping2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbTopping2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cmbTopping2ActionPerformed
+
+    private void txtTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTotalActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtTotalActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCari;
