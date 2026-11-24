@@ -405,7 +405,7 @@ private void resetInputBarang() {
         lblCari.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblCari.setText("Cari (Kode/Nama) :");
         pnlUtama.add(lblCari);
-        lblCari.setBounds(10, 60, 133, 22);
+        lblCari.setBounds(20, 60, 140, 22);
 
         txtCari.setBackground(new java.awt.Color(200, 224, 200));
         txtCari.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
@@ -415,7 +415,7 @@ private void resetInputBarang() {
             }
         });
         pnlUtama.add(txtCari);
-        txtCari.setBounds(150, 60, 390, 27);
+        txtCari.setBounds(170, 60, 370, 27);
 
         btnCari.setBackground(new java.awt.Color(143, 188, 143));
         btnCari.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N

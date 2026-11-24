@@ -314,12 +314,12 @@ public class FormProduk extends javax.swing.JFrame {
         lblCari.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblCari.setText("Cari (Kode/Nama) :");
         pnlUtama.add(lblCari);
-        lblCari.setBounds(20, 60, 132, 22);
+        lblCari.setBounds(20, 60, 140, 22);
 
         txtCari.setBackground(new java.awt.Color(200, 224, 200));
         txtCari.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         pnlUtama.add(txtCari);
-        txtCari.setBounds(160, 60, 280, 27);
+        txtCari.setBounds(180, 60, 260, 27);
 
         btnCari.setBackground(new java.awt.Color(143, 188, 143));
         btnCari.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -354,7 +354,7 @@ public class FormProduk extends javax.swing.JFrame {
         lblKode.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblKode.setText("Kode");
         pnlUtama.add(lblKode);
-        lblKode.setBounds(50, 260, 35, 22);
+        lblKode.setBounds(50, 260, 50, 22);
 
         txtKode.setBackground(new java.awt.Color(200, 224, 200));
         txtKode.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
@@ -364,7 +364,7 @@ public class FormProduk extends javax.swing.JFrame {
         lblKategori.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblKategori.setText("Kategori");
         pnlUtama.add(lblKategori);
-        lblKategori.setBounds(50, 300, 58, 22);
+        lblKategori.setBounds(50, 300, 80, 22);
 
         cmbKategori.setBackground(new java.awt.Color(200, 224, 200));
         cmbKategori.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
@@ -414,7 +414,7 @@ public class FormProduk extends javax.swing.JFrame {
         lblUkuran.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblUkuran.setText("Ukuran");
         pnlUtama.add(lblUkuran);
-        lblUkuran.setBounds(380, 300, 51, 22);
+        lblUkuran.setBounds(380, 300, 50, 22);
 
         cmbUkuran.setBackground(new java.awt.Color(200, 224, 200));
         cmbUkuran.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
@@ -424,7 +424,7 @@ public class FormProduk extends javax.swing.JFrame {
         lblStok.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblStok.setText("Stok");
         pnlUtama.add(lblStok);
-        lblStok.setBounds(380, 340, 31, 22);
+        lblStok.setBounds(380, 340, 50, 22);
 
         txtStok.setBackground(new java.awt.Color(200, 224, 200));
         txtStok.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
@@ -444,7 +444,7 @@ public class FormProduk extends javax.swing.JFrame {
             }
         });
         pnlUtama.add(btnTambah);
-        btnTambah.setBounds(20, 430, 84, 27);
+        btnTambah.setBounds(20, 430, 85, 27);
 
         btnUbah.setBackground(new java.awt.Color(143, 188, 143));
         btnUbah.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -464,7 +464,7 @@ public class FormProduk extends javax.swing.JFrame {
         btnHapus.setFocusPainted(false);
         btnHapus.setOpaque(true);
         pnlUtama.add(btnHapus);
-        btnHapus.setBounds(190, 430, 72, 27);
+        btnHapus.setBounds(190, 430, 80, 27);
 
         btnTambahStok.setBackground(new java.awt.Color(143, 188, 143));
         btnTambahStok.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -474,7 +474,7 @@ public class FormProduk extends javax.swing.JFrame {
         btnTambahStok.setFocusPainted(false);
         btnTambahStok.setOpaque(true);
         pnlUtama.add(btnTambahStok);
-        btnTambahStok.setBounds(270, 430, 118, 27);
+        btnTambahStok.setBounds(278, 430, 130, 27);
 
         btnBersihkan.setBackground(new java.awt.Color(143, 188, 143));
         btnBersihkan.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -484,7 +484,7 @@ public class FormProduk extends javax.swing.JFrame {
         btnBersihkan.setFocusPainted(false);
         btnBersihkan.setOpaque(true);
         pnlUtama.add(btnBersihkan);
-        btnBersihkan.setBounds(400, 430, 95, 27);
+        btnBersihkan.setBounds(415, 430, 110, 27);
 
         btnKembali.setBackground(new java.awt.Color(143, 188, 143));
         btnKembali.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -499,7 +499,7 @@ public class FormProduk extends javax.swing.JFrame {
         lblKeterangan.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         lblKeterangan.setText("Baris merah muda = stok menipis (di batas minimum atau kurang)");
         pnlUtama.add(lblKeterangan);
-        lblKeterangan.setBounds(20, 460, 385, 18);
+        lblKeterangan.setBounds(20, 460, 369, 18);
 
         getContentPane().add(pnlUtama, java.awt.BorderLayout.CENTER);
 
