@@ -370,6 +370,7 @@ private void resetInputBarang() {
         lblTopping = new javax.swing.JLabel();
         cmbTopping1 = new javax.swing.JComboBox<>();
         btnTambahTopping = new javax.swing.JButton();
+        cmbTopping2 = new javax.swing.JComboBox<>();
         lblCatatan = new javax.swing.JLabel();
         txtCatatan = new javax.swing.JTextField();
         btnTambahKeranjang = new javax.swing.JButton();
@@ -474,6 +475,16 @@ private void resetInputBarang() {
         btnTambahTopping.setOpaque(true);
         pnlUtama.add(btnTambahTopping);
         btnTambahTopping.setBounds(560, 250, 100, 27);
+
+        cmbTopping2.setBackground(new java.awt.Color(200, 224, 200));
+        cmbTopping2.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        cmbTopping2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbTopping2ActionPerformed(evt);
+            }
+        });
+        pnlUtama.add(cmbTopping2);
+        cmbTopping2.setBounds(230, 20, 320, 27);
 
         lblCatatan.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lblCatatan.setText("Catatan:");
@@ -610,6 +621,10 @@ private void resetInputBarang() {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtCariActionPerformed
 
+    private void cmbTopping2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbTopping2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbTopping2ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCari;
     private javax.swing.JButton btnCetak;
@@ -620,6 +635,7 @@ private void resetInputBarang() {
     private javax.swing.JButton btnTambahTopping;
     private javax.swing.JComboBox<String> cmbMetode;
     private javax.swing.JComboBox<String> cmbTopping1;
+    private javax.swing.JComboBox<String> cmbTopping2;
     private javax.swing.JLabel lblCari;
     private javax.swing.JLabel lblCatatan;
     private javax.swing.JLabel lblJumlah;
