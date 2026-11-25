@@ -156,11 +156,11 @@ Database terdiri dari empat tabel: pengguna, produk, transaksi, dan detail_trans
 | id_transaksi | INT, AUTO_INCREMENT | Primary key |
 | tanggal | DATETIME | Waktu transaksi |
 | total | DECIMAL(12,2) | Total belanja |
-| metode_pembayaran | ENUM(Tunai, QRIS, Transfer | 
+| metode_pembayaran | ENUM(Tunai, QRIS, Transfer) | metode-metode pembayaran | 
 | bayar | DECIMAL(12,2) | Uang dari pembeli |
 | kembalian | DECIMAL(12,2) | Bayar dikurangi total |
-| status_pesanan | ENUM(Belum, Selesai) | 
-| waktu_selesai | DATETIME | 
+| status_pesanan | ENUM(Belum, Selesai) | Status Pesanan |
+| waktu_selesai | DATETIME | saat pesanan selesai |
 | id_pengguna | INT | Foreign key ke pengguna (kasir yang melayani) |
 
 #### Tabel detail_transaksi
