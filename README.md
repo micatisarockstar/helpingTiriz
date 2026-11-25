@@ -39,7 +39,7 @@ Tiriz adalah kedai minuman dan makanan di daerah Jatinangor dengan slogan "Your 
 
 ### 1.2 Latar Belakang
 
-UMKM adalah tulang punggung ekonomi lokal, tetapi banyak yang masih mengelola usahanya dengan cara manual. Dari observasi kami ke Tiriz, ditemukan dua masalah utama:
+UMKM itu masih banyak yang masih mengelola usahanya dengan cara manual. Dari observasi kami ke Tiriz, ditemukan dua masalah utama:
 - Pendataan masih manual. Penjualan dan barang dicatat di buku atau secara lisan, sehingga rawan salah hitung, hilang, dan sulit direkap.
 - Pengelolaan stok masih kurang. Tidak ada catatan jumlah barang yang selalu diperbarui, sehingga Tiriz sulit mengetahui barang yang hampir habis dan bisa menjual barang yang sebenarnya sudah kosong.
 
