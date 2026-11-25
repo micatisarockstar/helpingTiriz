@@ -29,7 +29,7 @@ public class PenggunaDAO {
         return null;
     }
 
-    /** SHA-256 heksadesimal huruf kecil, sama dengan SHA2(teks, 256) di MySQL. */
+    /** SHA-256 heksadesimal huruf kecil, sama dengan SHA2(teks, 256) kl di mysql */
     private String hash(String teks) {
         try {
             byte[] digest = MessageDigest.getInstance("SHA-256").digest(teks.getBytes(StandardCharsets.UTF_8));

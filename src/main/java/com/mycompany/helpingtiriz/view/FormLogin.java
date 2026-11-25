@@ -1,59 +1,37 @@
 package com.mycompany.helpingtiriz.view;
 
-import com.mycompany.helpingtiriz.entity.Pengguna;
-import com.mycompany.helpingtiriz.model.Sesi;
-import com.mycompany.helpingtiriz.repository.PenggunaDAO;
-import java.sql.SQLException;
-import javax.swing.JOptionPane;
+import com.mycompany.helpingtiriz.controller.LoginController;
+import com.mycompany.helpingtiriz.exception.ValidasiException;
 
+/** VIEW Login: hanya menampilkan dan meneruskan klik ke LoginController. */
 public class FormLogin extends javax.swing.JFrame {
 
-    private final PenggunaDAO penggunaDAO = new PenggunaDAO();
+    private final LoginController controller = new LoginController();
 
     public FormLogin() {
         initComponents();
+        Tema.terapkan(getContentPane());
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        getRootPane().setDefaultButton(btnMasuk);      // tombol Enter = klik Masuk
+        getRootPane().setDefaultButton(btnMasuk);        // Enter = klik Masuk
 
         btnMasuk.addActionListener(e -> masuk());
-        btnKeluar.addActionListener(e -> keluar());
+        btnKeluar.addActionListener(e -> {
+            if (Tema.konfirmasi(this, "Keluar dari aplikasi?")) {
+                System.exit(0);
+            }
+        });
+        chkTampilkan.addActionListener(e ->
+                pwdPassword.setEchoChar(chkTampilkan.isSelected() ? (char) 0 : '•'));
     }
 
     private void masuk() {
-        String username = txtUsername.getText().trim();
-        String password = new String(pwdPassword.getPassword());
-
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Username dan password wajib diisi.",
-                    "Peringatan", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
         try {
-            Pengguna pengguna = penggunaDAO.login(username, password);
-            if (pengguna == null) {
-                JOptionPane.showMessageDialog(this, "Username atau password salah.",
-                        "Login Gagal", JOptionPane.ERROR_MESSAGE);
-                pwdPassword.setText("");
-                pwdPassword.requestFocus();
-                return;
-            }
-            Sesi.setPenggunaAktif(pengguna);           // simpan siapa yang login
-            new FormMenuUtama().setVisible(true);      // admin & kasir sama-sama ke menu utama
-            dispose();                                 // tutup form login
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Tidak bisa terhubung ke database.\nPastikan MySQL di Laragon sudah menyala.\n\n" + ex.getMessage(),
-                    "Error Database", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void keluar() {
-        int pilihan = JOptionPane.showConfirmDialog(this, "Keluar dari aplikasi?",
-                "Konfirmasi", JOptionPane.YES_NO_OPTION);
-        if (pilihan == JOptionPane.YES_OPTION) {
-            System.exit(0);
+            controller.masuk(txtUsername.getText(), new String(pwdPassword.getPassword()));
+            new FormMenuUtama().setVisible(true);
+            dispose();
+        } catch (ValidasiException ex) {
+            Tema.peringatan(this, ex.getMessage());
+            pwdPassword.setText("");
         }
     }
 
@@ -68,6 +46,7 @@ public class FormLogin extends javax.swing.JFrame {
         txtUsername = new javax.swing.JTextField();
         lblPassword = new javax.swing.JLabel();
         pwdPassword = new javax.swing.JPasswordField();
+        chkTampilkan = new javax.swing.JCheckBox();
         btnMasuk = new javax.swing.JButton();
         btnKeluar = new javax.swing.JButton();
 
@@ -76,77 +55,89 @@ public class FormLogin extends javax.swing.JFrame {
         setResizable(false);
 
         pnlUtama.setBackground(new java.awt.Color(255, 255, 255));
-        pnlUtama.setPreferredSize(new java.awt.Dimension(800, 560));
+        pnlUtama.setPreferredSize(new java.awt.Dimension(720, 480));
         pnlUtama.setLayout(null);
 
-        lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/logo_kecil.png"))); // NOI18N
+        lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/logo.png"))); // NOI18N
+
         pnlUtama.add(lblLogo);
-        lblLogo.setBounds(120, 0, 360, 101);
+        lblLogo.setBounds(180, 40, 360, 101);
 
-        lblTagline.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
+        lblTagline.setFont(new java.awt.Font("Poppins", 0, 16)); // NOI18N
         lblTagline.setForeground(new java.awt.Color(46, 139, 87));
+        lblTagline.setText("Your day with peace, love, and TIRIZ"); // NOI18N
         lblTagline.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblTagline.setText("Your day with peace, love, and TIRIZ");
+
         pnlUtama.add(lblTagline);
-        lblTagline.setBounds(20, 80, 351, 20);
+        lblTagline.setBounds(0, 152, 720, 28);
 
-        lblUsername.setFont(new java.awt.Font("Segoe UI", 0, 17)); // NOI18N
-        lblUsername.setText("Username");
+        lblUsername.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        lblUsername.setForeground(new java.awt.Color(31, 61, 43));
+        lblUsername.setText("Username"); // NOI18N
+
         pnlUtama.add(lblUsername);
-        lblUsername.setBounds(10, 130, 74, 24);
+        lblUsername.setBounds(150, 222, 110, 36);
 
-        txtUsername.setBackground(new java.awt.Color(200, 224, 200));
-        txtUsername.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        txtUsername.setBackground(new java.awt.Color(255, 255, 255));
+        txtUsername.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        txtUsername.setForeground(new java.awt.Color(31, 61, 43));
+
         pnlUtama.add(txtUsername);
-        txtUsername.setBounds(140, 130, 220, 28);
+        txtUsername.setBounds(270, 222, 300, 36);
 
-        lblPassword.setFont(new java.awt.Font("Segoe UI", 0, 17)); // NOI18N
-        lblPassword.setText("Password");
+        lblPassword.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        lblPassword.setForeground(new java.awt.Color(31, 61, 43));
+        lblPassword.setText("Password"); // NOI18N
+
         pnlUtama.add(lblPassword);
-        lblPassword.setBounds(10, 160, 90, 24);
+        lblPassword.setBounds(150, 274, 110, 36);
 
-        pwdPassword.setBackground(new java.awt.Color(200, 224, 200));
-        pwdPassword.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        pwdPassword.setBackground(new java.awt.Color(255, 255, 255));
+        pwdPassword.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        pwdPassword.setForeground(new java.awt.Color(31, 61, 43));
+
         pnlUtama.add(pwdPassword);
-        pwdPassword.setBounds(140, 160, 220, 28);
+        pwdPassword.setBounds(270, 274, 300, 36);
 
-        btnMasuk.setBackground(new java.awt.Color(60, 179, 113));
-        btnMasuk.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        chkTampilkan.setFont(new java.awt.Font("Poppins", 0, 13)); // NOI18N
+        chkTampilkan.setForeground(new java.awt.Color(31, 61, 43));
+        chkTampilkan.setText("Tampilkan password"); // NOI18N
+        chkTampilkan.setFocusPainted(false);
+
+        pnlUtama.add(chkTampilkan);
+        chkTampilkan.setBounds(270, 320, 220, 24);
+
+        btnMasuk.setBackground(new java.awt.Color(46, 139, 87));
+        btnMasuk.setFont(new java.awt.Font("Poppins Medium", 0, 15)); // NOI18N
         btnMasuk.setForeground(new java.awt.Color(255, 255, 255));
-        btnMasuk.setText("Masuk");
+        btnMasuk.setText("Masuk"); // NOI18N
         btnMasuk.setBorderPainted(false);
         btnMasuk.setFocusPainted(false);
         btnMasuk.setOpaque(true);
-        btnMasuk.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMasukActionPerformed(evt);
-            }
-        });
-        pnlUtama.add(btnMasuk);
-        btnMasuk.setBounds(150, 220, 80, 29);
 
-        btnKeluar.setBackground(new java.awt.Color(143, 188, 143));
-        btnKeluar.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        btnKeluar.setForeground(new java.awt.Color(255, 255, 255));
-        btnKeluar.setText("Keluar");
+        pnlUtama.add(btnMasuk);
+        btnMasuk.setBounds(270, 368, 144, 44);
+
+        btnKeluar.setBackground(new java.awt.Color(207, 229, 207));
+        btnKeluar.setFont(new java.awt.Font("Poppins Medium", 0, 15)); // NOI18N
+        btnKeluar.setForeground(new java.awt.Color(46, 139, 87));
+        btnKeluar.setText("Keluar"); // NOI18N
         btnKeluar.setBorderPainted(false);
         btnKeluar.setFocusPainted(false);
         btnKeluar.setOpaque(true);
+
         pnlUtama.add(btnKeluar);
-        btnKeluar.setBounds(150, 260, 79, 29);
+        btnKeluar.setBounds(426, 368, 144, 44);
 
         getContentPane().add(pnlUtama, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnMasukActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMasukActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnMasukActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnKeluar;
     private javax.swing.JButton btnMasuk;
+    private javax.swing.JCheckBox chkTampilkan;
     private javax.swing.JLabel lblLogo;
     private javax.swing.JLabel lblPassword;
     private javax.swing.JLabel lblTagline;
