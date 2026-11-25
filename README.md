@@ -156,8 +156,11 @@ Database terdiri dari empat tabel: pengguna, produk, transaksi, dan detail_trans
 | id_transaksi | INT, AUTO_INCREMENT | Primary key |
 | tanggal | DATETIME | Waktu transaksi |
 | total | DECIMAL(12,2) | Total belanja |
+| metode_pembayaran | ENUM(Tunai, QRIS, Transfer | 
 | bayar | DECIMAL(12,2) | Uang dari pembeli |
 | kembalian | DECIMAL(12,2) | Bayar dikurangi total |
+| status_pesanan | ENUM(Belum, Selesai) | 
+| waktu_selesai | DATETIME | 
 | id_pengguna | INT | Foreign key ke pengguna (kasir yang melayani) |
 
 #### Tabel detail_transaksi
@@ -188,12 +191,13 @@ Tabel detail_transaksi menjadi penghubung antara transaksi dan produk (relasi ba
 
 ### 4.1 Struktur Package
 
-| Package | Isi | Tugas |
-| --- | --- | --- |
-| tiriz.model | Pengguna, Produk, Transaksi, DetailTransaksi | Menyimpan data (atribut, getter, setter) |
-| tiriz.dao | PenggunaDAO, ProdukDAO, TransaksiDAO | Menjalankan query SQL ke database |
-| tiriz.view | FormLogin, FormMenuUtama, FormProduk, FormKasir, FormRiwayat | Tampilan Java Swing |
-| tiriz.util | Koneksi, Sesi | Koneksi database dan penyimpan data pengguna yang sedang login |
+| Lapisan | Folder | Tanggung jawab |
+|---|---|---|
+| **Model** | `entity/` | Bentuk data (Produk, Pengguna, Transaksi, DetailTransaksi) |
+| **Model** | `repository/` | Semua SQL dan koneksi database (DAO) |
+| **Controller** | `controller/` | Aturan bisnis dan validasi, keranjang, urutan langkah |
+| **View** | `view/` | Form, tabel, tombol, dialog |
+| Pendukung | `util/`, `exception/` | Alat bantu (Sesi, Validasi, FormatRupiah) dan jenis error |
 
 ### 4.2 Class Model
 
