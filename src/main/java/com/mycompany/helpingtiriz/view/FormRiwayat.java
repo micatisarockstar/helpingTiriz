@@ -1,43 +1,34 @@
 package com.mycompany.helpingtiriz.view;
 
-import com.mycompany.helpingtiriz.controller.RiwayatController;
-import com.mycompany.helpingtiriz.entity.DetailTransaksi;
 import com.mycompany.helpingtiriz.entity.Transaksi;
-import com.mycompany.helpingtiriz.exception.ValidasiException;
-import com.mycompany.helpingtiriz.util.FormatRupiah;
-import java.awt.Color;
-import java.time.format.DateTimeFormatter;
+import com.mycompany.helpingtiriz.model.DetailTableModel;
+import com.mycompany.helpingtiriz.model.TransaksiTableModel;
+import com.mycompany.helpingtiriz.repository.TransaksiDAO;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.table.DefaultTableModel;
 
-/** VIEW Riwayat Transaksi: daftar transaksi, detail barang, dan tombol Tandai Selesai. */
 public class FormRiwayat extends javax.swing.JFrame {
 
-    private final RiwayatController controller = new RiwayatController();
-    private final DefaultTableModel modelTransaksi = Tema.modelTabel(
-            "No", "Tanggal", "Kasir", "Metode", "Total", "Bayar", "Kembalian", "Status");
-    private final DefaultTableModel modelDetail = Tema.modelTabel(
-            "Barang", "Jumlah", "Harga Satuan", "Subtotal", "Catatan");
-    private List<Transaksi> daftar = new ArrayList<>();   // urutannya sama dengan tabel transaksi
+    private final TransaksiDAO transaksiDAO = new TransaksiDAO();
+    private final TransaksiTableModel transaksiModel = new TransaksiTableModel();
+    private final DetailTableModel detailModel = new DetailTableModel();
 
     public FormRiwayat() {
         initComponents();
-        Tema.terapkan(getContentPane());
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);   // tombol X ditangani di bawah
 
-        tblTransaksi.setModel(modelTransaksi);
+        tblTransaksi.setModel(transaksiModel);
+        tblTransaksi.setDefaultRenderer(Object.class, new BarisRenderer());   // baris kuning = Belum
         tblTransaksi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblDetail.setModel(modelDetail);
-        Tema.lebarKolom(tblTransaksi, 50, 160, 170, 110, 130, 130, 130, 160);
-        Tema.lebarKolom(tblDetail, 300, 80, 150, 150, 330);
-        Tema.bungkusKolom(tblDetail, 4);                   // catatan panjang turun ke bawah
-        Tema.sorotBaris(tblTransaksi, 7, Transaksi.STATUS_BELUM, new Color(0xFFF3CD));   // kuning = belum diserahkan
+        tblDetail.setModel(detailModel);
+        BarisRenderer.aturLebarKolom(tblTransaksi, 50, 160, 170, 110, 130, 130, 130, 160);
+        BarisRenderer.aturLebarKolom(tblDetail, 330, 80, 160, 160, 310);
 
-        cmbFilter.setModel(new DefaultComboBoxModel<>(RiwayatController.FILTER));
+        cmbFilter.setModel(new DefaultComboBoxModel<>(new String[]{"Semua", "Belum", "Selesai"}));
         btnTandaiSelesai.setEnabled(false);
 
         cmbFilter.addActionListener(e -> muatTransaksi());
@@ -60,20 +51,11 @@ public class FormRiwayat extends javax.swing.JFrame {
 
     private void muatTransaksi() {
         try {
-            daftar = controller.muat((String) cmbFilter.getSelectedItem());
-        } catch (ValidasiException ex) {
-            Tema.error(this, ex.getMessage());
-            return;
-        }
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-        modelTransaksi.setRowCount(0);
-        modelDetail.setRowCount(0);
-        btnTandaiSelesai.setEnabled(false);
-        int no = 1;
-        for (Transaksi t : daftar) {
-            modelTransaksi.addRow(new Object[]{no++, t.getTanggal().format(format), t.getNamaKasir(),
-                t.getMetodePembayaran(), FormatRupiah.format(t.getTotal()), FormatRupiah.format(t.getBayar()),
-                FormatRupiah.format(t.getKembalian()), t.getStatusPesanan()});
+            transaksiModel.setData(transaksiDAO.ambilSemua((String) cmbFilter.getSelectedItem()));
+            detailModel.setData(new ArrayList<>());      // kosongkan detail
+            btnTandaiSelesai.setEnabled(false);
+        } catch (SQLException ex) {
+            tampilkanError(ex);
         }
     }
 
@@ -81,48 +63,57 @@ public class FormRiwayat extends javax.swing.JFrame {
     private void muatDetail() {
         Transaksi t = transaksiTerpilih();
         if (t == null) {
+            btnTandaiSelesai.setEnabled(false);
             return;
         }
         try {
-            List<DetailTransaksi> detail = controller.ambilDetail(t);
-            modelDetail.setRowCount(0);
-            for (DetailTransaksi d : detail) {
-                modelDetail.addRow(new Object[]{d.getProduk().getNamaTampil(), d.getJumlah(),
-                    FormatRupiah.format(d.getHargaSatuan()), FormatRupiah.format(d.getSubtotal()),
-                    d.getCatatan() == null ? "" : d.getCatatan()});
-            }
-            Tema.sesuaikanTinggi(tblDetail, 4);
-            btnTandaiSelesai.setEnabled(!t.isSelesai());
-        } catch (ValidasiException ex) {
-            Tema.error(this, ex.getMessage());
+            detailModel.setData(transaksiDAO.ambilDetail(t.getIdTransaksi()));
+            btnTandaiSelesai.setEnabled(!t.isSelesai());   // hanya aktif untuk yang masih Belum
+        } catch (SQLException ex) {
+            tampilkanError(ex);
         }
     }
 
     private void tandaiSelesai() {
         Transaksi t = transaksiTerpilih();
-        if (t == null) {
-            Tema.peringatan(this, "Pilih transaksi yang akan ditandai selesai.");
+        if (t == null || t.isSelesai()) {
             return;
         }
-        if (!Tema.konfirmasi(this, "Pesanan sudah diserahkan ke pelanggan?\n(Kasir: " + t.getNamaKasir() + ")")) {
+        int pilihan = JOptionPane.showConfirmDialog(this,
+                "Pesanan sudah diserahkan ke pelanggan?\n(Transaksi: " + t.getNamaKasir() + ", "
+                        + transaksiModel.getValueAt(tblTransaksi.convertRowIndexToModel(tblTransaksi.getSelectedRow()), 1) + ")",
+                "Tandai Selesai", JOptionPane.YES_NO_OPTION);
+        if (pilihan != JOptionPane.YES_OPTION) {
             return;
         }
         try {
-            controller.tandaiSelesai(t);
-        } catch (ValidasiException ex) {
-            Tema.peringatan(this, ex.getMessage());
+            if (transaksiDAO.tandaiSelesai(t.getIdTransaksi())) {
+                muatTransaksi();                         // muat ulang supaya status & warna berubah
+            } else {
+                JOptionPane.showMessageDialog(this, "Pesanan ini sudah berstatus Selesai.");
+                muatTransaksi();
+            }
+        } catch (SQLException ex) {
+            tampilkanError(ex);
         }
-        muatTransaksi();                                  // muat ulang supaya status dan warna berubah
     }
 
     private Transaksi transaksiTerpilih() {
         int baris = tblTransaksi.getSelectedRow();
-        return baris < 0 ? null : daftar.get(baris);
+        if (baris < 0) {
+            return null;
+        }
+        return transaksiModel.getAt(tblTransaksi.convertRowIndexToModel(baris));
     }
 
     private void kembali() {
         new FormMenuUtama().setVisible(true);
         dispose();
+    }
+
+    private void tampilkanError(SQLException ex) {
+        JOptionPane.showMessageDialog(this, "Terjadi kesalahan database:\n" + ex.getMessage(),
+                "Error Database", JOptionPane.ERROR_MESSAGE);
     }
 
     @SuppressWarnings("unchecked")
@@ -147,43 +138,28 @@ public class FormRiwayat extends javax.swing.JFrame {
         setResizable(false);
 
         pnlUtama.setBackground(new java.awt.Color(255, 255, 255));
-        pnlUtama.setPreferredSize(new java.awt.Dimension(1100, 660));
-        pnlUtama.setLayout(null);
+        pnlUtama.setPreferredSize(new java.awt.Dimension(1100, 700));
 
         lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/logo_kecil.png"))); // NOI18N
 
-        pnlUtama.add(lblLogo);
-        lblLogo.setBounds(24, 16, 150, 42);
+        lblDaftar.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblDaftar.setText("Daftar Transaksi");
 
-        lblDaftar.setFont(new java.awt.Font("Poppins", 1, 18)); // NOI18N
-        lblDaftar.setForeground(new java.awt.Color(46, 139, 87));
-        lblDaftar.setText("Daftar Transaksi"); // NOI18N
+        lblFilter.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        lblFilter.setText("Status:");
 
-        pnlUtama.add(lblDaftar);
-        lblDaftar.setBounds(24, 72, 300, 32);
+        cmbFilter.setBackground(new java.awt.Color(200, 224, 200));
+        cmbFilter.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        cmbFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbFilterActionPerformed(evt);
+            }
+        });
 
-        lblFilter.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-        lblFilter.setForeground(new java.awt.Color(31, 61, 43));
-        lblFilter.setText("Status:"); // NOI18N
-        lblFilter.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-
-        pnlUtama.add(lblFilter);
-        lblFilter.setBounds(760, 70, 110, 36);
-
-        cmbFilter.setBackground(new java.awt.Color(255, 255, 255));
-        cmbFilter.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
-        cmbFilter.setForeground(new java.awt.Color(31, 61, 43));
-        cmbFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Semua", "Belum", "Selesai" }));
-
-        pnlUtama.add(cmbFilter);
-        cmbFilter.setBounds(876, 70, 200, 36);
-
-
-        tblTransaksi.setFont(new java.awt.Font("Poppins", 0, 13)); // NOI18N
-        tblTransaksi.setRowHeight(30);
-        tblTransaksi.setFillsViewportHeight(true);
+        tblTransaksi.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         tblTransaksi.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
+                {null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null},
@@ -194,25 +170,16 @@ public class FormRiwayat extends javax.swing.JFrame {
                 "No", "Tanggal", "Kasir", "Metode", "Total", "Bayar", "Kembalian", "Status"
             }
         ));
-
+        tblTransaksi.setRowHeight(26);
         spTransaksi.setViewportView(tblTransaksi);
 
-        pnlUtama.add(spTransaksi);
-        spTransaksi.setBounds(24, 116, 1052, 232);
+        lblDetail.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblDetail.setText("Detail Barang");
 
-        lblDetail.setFont(new java.awt.Font("Poppins", 1, 18)); // NOI18N
-        lblDetail.setForeground(new java.awt.Color(46, 139, 87));
-        lblDetail.setText("Detail Barang"); // NOI18N
-
-        pnlUtama.add(lblDetail);
-        lblDetail.setBounds(24, 364, 300, 32);
-
-
-        tblDetail.setFont(new java.awt.Font("Poppins", 0, 13)); // NOI18N
-        tblDetail.setRowHeight(30);
-        tblDetail.setFillsViewportHeight(true);
+        tblDetail.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
         tblDetail.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
+                {null, null, null, null, null},
                 {null, null, null, null, null},
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -223,38 +190,102 @@ public class FormRiwayat extends javax.swing.JFrame {
                 "Barang", "Jumlah", "Harga Satuan", "Subtotal", "Catatan"
             }
         ));
-
+        tblDetail.setRowHeight(26);
         spDetail.setViewportView(tblDetail);
 
-        pnlUtama.add(spDetail);
-        spDetail.setBounds(24, 404, 1052, 168);
-
-        btnTandaiSelesai.setBackground(new java.awt.Color(46, 139, 87));
-        btnTandaiSelesai.setFont(new java.awt.Font("Poppins Medium", 0, 14)); // NOI18N
+        btnTandaiSelesai.setBackground(new java.awt.Color(60, 179, 113));
+        btnTandaiSelesai.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
         btnTandaiSelesai.setForeground(new java.awt.Color(255, 255, 255));
-        btnTandaiSelesai.setText("Tandai Selesai"); // NOI18N
+        btnTandaiSelesai.setText("Tandai Selesai");
         btnTandaiSelesai.setBorderPainted(false);
         btnTandaiSelesai.setFocusPainted(false);
         btnTandaiSelesai.setOpaque(true);
+        btnTandaiSelesai.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTandaiSelesaiActionPerformed(evt);
+            }
+        });
 
-        pnlUtama.add(btnTandaiSelesai);
-        btnTandaiSelesai.setBounds(24, 592, 200, 44);
-
-        btnKembali.setBackground(new java.awt.Color(207, 229, 207));
-        btnKembali.setFont(new java.awt.Font("Poppins Medium", 0, 14)); // NOI18N
-        btnKembali.setForeground(new java.awt.Color(46, 139, 87));
-        btnKembali.setText("Kembali"); // NOI18N
+        btnKembali.setBackground(new java.awt.Color(143, 188, 143));
+        btnKembali.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
+        btnKembali.setForeground(new java.awt.Color(255, 255, 255));
+        btnKembali.setText("Kembali");
         btnKembali.setBorderPainted(false);
         btnKembali.setFocusPainted(false);
         btnKembali.setOpaque(true);
+        btnKembali.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnKembaliActionPerformed(evt);
+            }
+        });
 
-        pnlUtama.add(btnKembali);
-        btnKembali.setBounds(956, 592, 120, 44);
+        javax.swing.GroupLayout pnlUtamaLayout = new javax.swing.GroupLayout(pnlUtama);
+        pnlUtama.setLayout(pnlUtamaLayout);
+        pnlUtamaLayout.setHorizontalGroup(
+            pnlUtamaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlUtamaLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(lblLogo))
+            .addGroup(pnlUtamaLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(lblDaftar)
+                .addGap(331, 331, 331)
+                .addComponent(lblFilter)
+                .addGap(4, 4, 4)
+                .addComponent(cmbFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(pnlUtamaLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(spTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 640, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(pnlUtamaLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(lblDetail))
+            .addGroup(pnlUtamaLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(spDetail, javax.swing.GroupLayout.PREFERRED_SIZE, 640, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(pnlUtamaLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(btnTandaiSelesai, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(390, 390, 390)
+                .addComponent(btnKembali))
+        );
+        pnlUtamaLayout.setVerticalGroup(
+            pnlUtamaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlUtamaLayout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(lblLogo)
+                .addGap(8, 8, 8)
+                .addGroup(pnlUtamaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblDaftar)
+                    .addComponent(lblFilter)
+                    .addComponent(cmbFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(13, 13, 13)
+                .addComponent(spTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
+                .addComponent(lblDetail)
+                .addGap(5, 5, 5)
+                .addComponent(spDetail, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20)
+                .addGroup(pnlUtamaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnTandaiSelesai, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnKembali)))
+        );
 
         getContentPane().add(pnlUtama, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void cmbFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbFilterActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmbFilterActionPerformed
+
+    private void btnTandaiSelesaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTandaiSelesaiActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnTandaiSelesaiActionPerformed
+
+    private void btnKembaliActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKembaliActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnKembaliActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnKembali;

@@ -1,8 +1,6 @@
 package com.mycompany.helpingtiriz.entity;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DetailTransaksi {
     private int idDetail;
@@ -11,7 +9,6 @@ public class DetailTransaksi {
     private BigDecimal hargaSatuan = BigDecimal.ZERO;
     private BigDecimal subtotal = BigDecimal.ZERO;
     private String catatan;        // topping + catatan bebas
-    private List<Produk> topping = new ArrayList<>();   // topping yang dipilih (cm di keranjang, ga disimpan sebagai kolom)
 
     public int getIdDetail() { return idDetail; }
     public void setIdDetail(int idDetail) { this.idDetail = idDetail; }
@@ -25,9 +22,6 @@ public class DetailTransaksi {
     public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
     public String getCatatan() { return catatan; }
     public void setCatatan(String catatan) { this.catatan = catatan; }
-
-    public List<Produk> getTopping() { return topping; }
-    public void setTopping(List<Produk> topping) { this.topping = topping; }
 
     /** subtotal = jumlah x hargaSatuan. */
     public BigDecimal hitungSubtotal() {

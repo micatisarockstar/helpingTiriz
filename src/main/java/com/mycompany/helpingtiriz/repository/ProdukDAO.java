@@ -13,7 +13,7 @@ public class ProdukDAO {
     private static final String KOLOM =
             "id_produk, kode_produk, nama_produk, kategori, ukuran, harga, stok, stok_minimum";
 
-    /** Semua produk (untuk data barang), Keyword kosong = tampilkan semua. */
+    /** Semua produk (untuk Data Barang). Keyword kosong = tampilkan semua. */
     public List<Produk> cari(String keyword) throws SQLException {
         String sql = "SELECT " + KOLOM + " FROM produk "
                 + "WHERE kode_produk LIKE ? OR nama_produk LIKE ? ORDER BY id_produk";
@@ -51,34 +51,31 @@ public class ProdukDAO {
         }
     }
 
-    /** @return jumlah baris yang berubah (0 = produk tidak ditemukan, mungkin sudah dihapus) */
-    public int ubah(Produk p) throws SQLException {
+    public void ubah(Produk p) throws SQLException {
         String sql = "UPDATE produk SET kode_produk = ?, nama_produk = ?, kategori = ?, ukuran = ?, "
                 + "harga = ?, stok = ?, stok_minimum = ? WHERE id_produk = ?";
         try (Connection c = Koneksi.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             isiParameter(ps, p);
             ps.setInt(8, p.getIdProduk());
-            return ps.executeUpdate();
+            ps.executeUpdate();
         }
     }
 
-    /** @return jumlah baris yang terhapus (0 = produk tidak ditemukan) */
-    public int hapus(int idProduk) throws SQLException {
+    public void hapus(int idProduk) throws SQLException {
         try (Connection c = Koneksi.getConnection();
              PreparedStatement ps = c.prepareStatement("DELETE FROM produk WHERE id_produk = ?")) {
             ps.setInt(1, idProduk);
-            return ps.executeUpdate();
+            ps.executeUpdate();
         }
     }
 
-    /** @return jumlah baris yang berubah (0 = produk tidak ditemukan) */
-    public int tambahStok(int idProduk, int jumlah) throws SQLException {
+    public void tambahStok(int idProduk, int jumlah) throws SQLException {
         try (Connection c = Koneksi.getConnection();
              PreparedStatement ps = c.prepareStatement("UPDATE produk SET stok = stok + ? WHERE id_produk = ?")) {
             ps.setInt(1, jumlah);
             ps.setInt(2, idProduk);
-            return ps.executeUpdate();
+            ps.executeUpdate();
         }
     }
 
@@ -110,8 +107,9 @@ public class ProdukDAO {
     }
 
     // ---------- helper ----------
+
     private List<Produk> ambilDenganKeyword(String sql, String keyword) throws SQLException {
-        String pola = "%" + escapeLike(keyword) + "%";
+        String pola = "%" + keyword + "%";
         List<Produk> hasil = new ArrayList<>();
         try (Connection c = Koneksi.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -124,11 +122,6 @@ public class ProdukDAO {
             }
         }
         return hasil;
-    }
-
-    /** Supaya karakter % dan _ yang diketik user dianggap huruf biasa, bukan wildcard LIKE. */
-    private String escapeLike(String teks) {
-        return teks.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
     }
 
     private void isiParameter(PreparedStatement ps, Produk p) throws SQLException {

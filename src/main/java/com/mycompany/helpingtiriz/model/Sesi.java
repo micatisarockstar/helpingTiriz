@@ -1,13 +1,10 @@
-package com.mycompany.helpingtiriz.util;
+package com.mycompany.helpingtiriz.model;
 
 import com.mycompany.helpingtiriz.entity.Pengguna;
 
 /** Menyimpan siapa yang sedang login selama aplikasi berjalan. */
-public final class Sesi {
+public class Sesi {
     private static Pengguna penggunaAktif;
-
-    private Sesi() {
-    }
 
     public static Pengguna getPenggunaAktif() {
         return penggunaAktif;
@@ -15,10 +12,6 @@ public final class Sesi {
 
     public static void setPenggunaAktif(Pengguna pengguna) {
         penggunaAktif = pengguna;
-    }
-
-    public static boolean sudahLogin() {
-        return penggunaAktif != null;
     }
 
     public static boolean isAdmin() {

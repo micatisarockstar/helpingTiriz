@@ -3,7 +3,6 @@ package com.mycompany.helpingtiriz.repository;
 import com.mycompany.helpingtiriz.entity.DetailTransaksi;
 import com.mycompany.helpingtiriz.entity.Produk;
 import com.mycompany.helpingtiriz.entity.Transaksi;
-import com.mycompany.helpingtiriz.exception.ValidasiException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,7 +21,7 @@ public class TransaksiDAO {
      *
      * @return id_transaksi yang baru dibuat
      */
-    public int simpanTransaksi(Transaksi t) throws SQLException, ValidasiException {
+    public int simpanTransaksi(Transaksi t) throws SQLException, StokTidakCukupException {
         String sqlTransaksi = "INSERT INTO transaksi "
                 + "(tanggal, total, metode_pembayaran, bayar, kembalian, status_pesanan, id_pengguna) "
                 + "VALUES (NOW(), ?, ?, ?, ?, 'Belum', ?)";
@@ -55,19 +54,7 @@ public class TransaksiDAO {
                         psStok.setInt(2, d.getProduk().getIdProduk());
                         psStok.setInt(3, d.getJumlah());
                         if (psStok.executeUpdate() == 0) {
-                            throw new ValidasiException("Stok " + d.getProduk().getNamaTampil()
-                                    + " sudah berubah dan tidak cukup. Transaksi dibatalkan, cek ulang keranjang.");
-                        }
-
-                        // topping juga dikurangi stoknya: sebanyak jumlah minuman/makanan x tiap topping
-                        for (Produk top : d.getTopping()) {
-                            psStok.setInt(1, d.getJumlah());
-                            psStok.setInt(2, top.getIdProduk());
-                            psStok.setInt(3, d.getJumlah());
-                            if (psStok.executeUpdate() == 0) {
-                                throw new ValidasiException("Stok topping " + top.getNamaProduk()
-                                        + " sudah berubah dan tidak cukup. Transaksi dibatalkan, cek ulang keranjang.");
-                            }
+                            throw new StokTidakCukupException(d.getProduk().getNamaTampil());
                         }
 
                         String catatan = d.getCatatan();
@@ -83,7 +70,7 @@ public class TransaksiDAO {
 
                 c.commit();
                 return idTransaksi;
-            } catch (SQLException | ValidasiException | RuntimeException e) {
+            } catch (SQLException | StokTidakCukupException | RuntimeException e) {
                 c.rollback();
                 throw e;
             } finally {
