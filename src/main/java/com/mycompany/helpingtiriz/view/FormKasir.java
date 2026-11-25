@@ -1,89 +1,73 @@
 package com.mycompany.helpingtiriz.view;
 
+import com.mycompany.helpingtiriz.controller.KasirController;
 import com.mycompany.helpingtiriz.entity.DetailTransaksi;
 import com.mycompany.helpingtiriz.entity.Produk;
 import com.mycompany.helpingtiriz.entity.Transaksi;
-import com.mycompany.helpingtiriz.model.FormatRupiah;
-import com.mycompany.helpingtiriz.model.KeranjangTableModel;
-import com.mycompany.helpingtiriz.model.ProdukTableModel;
-import com.mycompany.helpingtiriz.model.Sesi;
-import com.mycompany.helpingtiriz.repository.ProdukDAO;
-import com.mycompany.helpingtiriz.repository.StokTidakCukupException;
-import com.mycompany.helpingtiriz.repository.TransaksiDAO;
+import com.mycompany.helpingtiriz.exception.ValidasiException;
+import com.mycompany.helpingtiriz.util.FormatRupiah;
+import java.awt.Color;
 import java.awt.Font;
 import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
 
+/** VIEW Kasir: aturan stok, topping, dan pembayaran ada di KasirController */
 public class FormKasir extends javax.swing.JFrame {
 
     private static final String TANPA_TOPPING = "(Tanpa topping)";
 
-    private final ProdukDAO produkDAO = new ProdukDAO();
-    private final TransaksiDAO transaksiDAO = new TransaksiDAO();
-    private final ProdukTableModel produkModel = new ProdukTableModel();
-    private final KeranjangTableModel keranjangModel = new KeranjangTableModel();
+    private final KasirController controller = new KasirController();
+    private final DefaultTableModel modelProduk = Tema.modelTabel(
+            "ID", "Kode", "Nama", "Kategori", "Ukuran", "Harga", "Stok", "Stok Min", "Status");
+    private final DefaultTableModel modelKeranjang = Tema.modelTabel(
+            "Nama", "Jumlah", "Harga", "Subtotal", "Catatan");
+    private List<Produk> daftarProduk = new ArrayList<>();   // urutannya sama dengan tabel produk
 
     public FormKasir() {
         initComponents();
+        Tema.terapkan(getContentPane());
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);   // tombol X ditangani di bawah
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
-        tblProduk.setModel(produkModel);
-        tblProduk.setDefaultRenderer(Object.class, new BarisRenderer());
+        tblProduk.setModel(modelProduk);
         tblProduk.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblKeranjang.setModel(keranjangModel);
+        tblProduk.setFont(tblProduk.getFont().deriveFont(12f));
+        Tema.lebarKolom(tblProduk, 28, 84, 120, 70, 50, 76, 38, 56, 58);
+        Tema.sorotBaris(tblProduk, 8, "Menipis", new Color(0xFFD6DC));
+        tblKeranjang.setModel(modelKeranjang);
         tblKeranjang.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        BarisRenderer.aturLebarKolom(tblProduk, 30, 95, 140, 65, 50, 80, 40, 55, 65);
-        BarisRenderer.aturLebarKolom(tblKeranjang, 170, 55, 85, 90, 170);
+        Tema.lebarKolom(tblKeranjang, 130, 50, 86, 86, 184);
+        Tema.bungkusKolom(tblKeranjang, 4);                // catatan panjang turun ke bawah
 
-        spnJumlah.setModel(new SpinnerNumberModel(1, 1, 999, 1));
-        cmbMetode.setModel(new DefaultComboBoxModel<>(new String[]{"Tunai", "QRIS", "Transfer"}));
+        cmbMetode.setModel(new DefaultComboBoxModel<>(KasirController.METODE));
         txtTotal.setEditable(false);
         txtKembalian.setEditable(false);
-        cmbTopping1.setVisible(false);                   // Diperbaiki dari cmbToppin1
 
-        pasangEvent();
-        muatTopping();
-        muatProduk("");
-        aturTopping();
-        perbaruiTotal();
-    }
-
-    private void pasangEvent() {
-        btnCari.addActionListener(e -> muatProduk(txtCari.getText().trim()));
-        txtCari.addActionListener(e -> muatProduk(txtCari.getText().trim()));
+        btnCari.addActionListener(e -> muatProduk());
+        txtCari.addActionListener(e -> muatProduk());
         tblProduk.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 aturTopping();
             }
         });
-
-        btnTambahTopping.addActionListener(e -> {
-            cmbTopping1.setVisible(true);
-            btnTambahTopping.setEnabled(false);          // maksimal 2 topping gratis
-        });
+        cmbTopping1.addActionListener(e -> toppingPertamaBerubah());
         btnTambahKeranjang.addActionListener(e -> tambahKeKeranjang());
         btnHapusItem.addActionListener(e -> hapusItem());
         btnKosongkan.addActionListener(e -> kosongkanKeranjang());
-
         cmbMetode.addActionListener(e -> aturPembayaran());
         txtUangBayar.getDocument().addDocumentListener(new DocumentListener() {
             @Override public void insertUpdate(DocumentEvent e) { hitungKembalian(); }
             @Override public void removeUpdate(DocumentEvent e) { hitungKembalian(); }
             @Override public void changedUpdate(DocumentEvent e) { hitungKembalian(); }
         });
-
         btnCetak.addActionListener(e -> cetakTransaksi());
         btnKembali.addActionListener(e -> kembali());
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -92,266 +76,168 @@ public class FormKasir extends javax.swing.JFrame {
                 kembali();
             }
         });
+
+        muatTopping();
+        muatProduk();
+        aturTopping();
+        aturPembayaran();
+        perbaruiKeranjang();
+    }
+
+    // ---------------- topping ----------------
+
+    /** Dua kotak topping, kotak ke-2 aktif setelah topping pertama dipilih (topping boleh sama). */
+    private void aturTopping() {
+        Produk p = produkTerpilih();
+        boolean bisa = p != null;                          // minuman dan makanan boleh diberi topping
+        if (!bisa) {
+            cmbTopping1.setSelectedIndex(0);
+            cmbTopping2.setSelectedIndex(0);
+        }
+        cmbTopping1.setEnabled(bisa);
+        cmbTopping2.setEnabled(bisa && cmbTopping1.getSelectedIndex() > 0);
+    }
+
+    private void toppingPertamaBerubah() {
+        if (cmbTopping1.getSelectedIndex() <= 0) {
+            cmbTopping2.setSelectedIndex(0);              // tanpa topping 1, topping 2 ikut kosong
+        }
+        aturTopping();
+    }
+
+    private String pilihanTopping(javax.swing.JComboBox<String> kotak) {
+        return kotak.isEnabled() && kotak.getSelectedIndex() > 0 ? (String) kotak.getSelectedItem() : null;
     }
 
     // ---------------- keranjang ----------------
 
-   private void tambahKeKeranjang() {
-        Produk p = produkTerpilih();
-        if (p == null) {
-            peringatan("Pilih barang di tabel terlebih dahulu.");
+    private void tambahKeKeranjang() {
+        try {
+            spnJumlah.commitEdit();                       // pastikan angka yang diketik terbaca
+        } catch (ParseException ex) {
+            Tema.peringatan(this, "Jumlah harus berupa angka 1 sampai 999.");
             return;
         }
-        int jumlah = (Integer) spnJumlah.getValue();
-
-        // Validasi stok: jumlah di keranjang + jumlah baru tidak boleh melebihi stok
-        int sudahAda = keranjangModel.jumlahDiKeranjang(p.getIdProduk());
-        if (sudahAda + jumlah > p.getStok()) {
-            String pesan = "Stok " + p.getNamaTampil() + " tidak cukup.\nSisa stok: " + p.getStok();
-            if (sudahAda > 0) {
-                pesan += " (" + sudahAda + " sudah ada di keranjang)";
-            }
-            JOptionPane.showMessageDialog(this, pesan, "Stok Tidak Cukup", JOptionPane.WARNING_MESSAGE);
-            return;                                      // barang TIDAK masuk keranjang
+        try {
+            controller.tambahKeKeranjang(produkTerpilih(), ((Number) spnJumlah.getValue()).intValue(),
+                    pilihanTopping(cmbTopping1), pilihanTopping(cmbTopping2), txtCatatan.getText());
+        } catch (ValidasiException ex) {
+            Tema.peringatan(this, ex.getMessage());
+            return;
         }
-
-        // Ambil 1 topping saja (pastikan hanya menggunakan cmbTopping1)
-        String topping = (cmbTopping1.isVisible() && cmbTopping1.getSelectedIndex() > 0)
-                ? (String) cmbTopping1.getSelectedItem() : null;
-
-        // Catatan = "Topping: Caramel Crumble | catatan bebas"
-        List<String> bagian = new ArrayList<>();
-        if (topping != null) {
-            bagian.add("Topping: " + topping);
-        }
-        if (!txtCatatan.getText().trim().isEmpty()) {
-            bagian.add(txtCatatan.getText().trim());
-        }
-        String catatan = String.join(" | ", bagian);
-        if (catatan.length() > 200) {
-            catatan = catatan.substring(0, 200);         // batas kolom di database
-        }
-
-        DetailTransaksi d = new DetailTransaksi();
-        d.setProduk(p);
-        d.setJumlah(jumlah);
-        d.setHargaSatuan(p.getHarga());
-        d.setCatatan(catatan);
-        d.hitungSubtotal();
-        keranjangModel.tambah(d);
-
-        perbaruiTotal();
-        resetInputBarang();
+        perbaruiKeranjang();
+        spnJumlah.setValue(1);
+        cmbTopping1.setSelectedIndex(0);
+        cmbTopping2.setSelectedIndex(0);
+        txtCatatan.setText("");
+        aturTopping();
     }
-   
-   private void hapusItem() {
-        int baris = tblKeranjang.getSelectedRow();
-        if (baris < 0) {
-            peringatan("Pilih baris di keranjang yang akan dihapus.");
-            return;
+
+    private void hapusItem() {
+        try {
+            controller.hapusItem(tblKeranjang.getSelectedRow());
+            perbaruiKeranjang();
+        } catch (ValidasiException ex) {
+            Tema.peringatan(this, ex.getMessage());
         }
-        keranjangModel.hapus(tblKeranjang.convertRowIndexToModel(baris));
-        perbaruiTotal();
     }
 
     private void kosongkanKeranjang() {
-        if (keranjangModel.getRowCount() == 0) {
-            return;
-        }
-        int pilihan = JOptionPane.showConfirmDialog(this, "Kosongkan seluruh keranjang?",
-                "Konfirmasi", JOptionPane.YES_NO_OPTION);
-        if (pilihan == JOptionPane.YES_OPTION) {
-            keranjangModel.kosongkan();
-            perbaruiTotal();
+        if (!controller.getKeranjang().isEmpty() && Tema.konfirmasi(this, "Kosongkan seluruh keranjang?")) {
+            controller.kosongkan();
+            perbaruiKeranjang();
         }
     }
 
-    // ---------------- pembayaran ----------------
-
+    // ---------------- pembayaran ----------------//
     private void cetakTransaksi() {
-        if (keranjangModel.getRowCount() == 0) {
-            peringatan("Keranjang masih kosong.");
-            return;
-        }
-
-        BigDecimal total = keranjangModel.hitungTotal();
-        String metode = (String) cmbMetode.getSelectedItem();
-        BigDecimal bayar;
-        if ("Tunai".equals(metode)) {
-            try {
-                bayar = FormatRupiah.parse(txtUangBayar.getText());
-            } catch (NumberFormatException ex) {
-                peringatan("Uang bayar harus diisi dengan angka.");
-                return;
-            }
-            if (bayar.compareTo(total) < 0) {
-                peringatan("Uang bayar kurang " + FormatRupiah.format(total.subtract(bayar)) + ".");
-                return;
-            }
-        } else {
-            bayar = total;                               // QRIS / Transfer: pas
-        }
-
-        Transaksi t = new Transaksi();
-        t.setIdPengguna(Sesi.getPenggunaAktif().getIdPengguna());
-        t.setMetodePembayaran(metode);
-        t.setDaftarDetail(new ArrayList<>(keranjangModel.getItems()));
-        t.setTotal(t.hitungTotal());
-        t.setBayar(bayar);
-        t.setKembalian(t.hitungKembalian());
-
         try {
-            int idTransaksi = transaksiDAO.simpanTransaksi(t);
-            t.setIdTransaksi(idTransaksi);
-            tampilkanStruk(t);
-
-            keranjangModel.kosongkan();
+            Transaksi t = controller.bayarDanSimpan((String) cmbMetode.getSelectedItem(), txtUangBayar.getText());
+            JTextArea struk = new JTextArea(controller.buatStruk(t));
+            struk.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+            struk.setEditable(false);
+            javax.swing.JOptionPane.showMessageDialog(this, struk, "Struk Transaksi",
+                    javax.swing.JOptionPane.PLAIN_MESSAGE);
             txtUangBayar.setText("");
-            perbaruiTotal();
-            muatProduk(txtCari.getText().trim());        // supaya stok terbaru kelaiatan
-        } catch (StokTidakCukupException ex) {
-            peringatan(ex.getMessage() + "\nTransaksi dibatalkan, stok sudah berubah. Cek ulang keranjang.");
-            muatProduk(txtCari.getText().trim());
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Gagal menyimpan transaksi:\n" + ex.getMessage(),
-                    "Error Database", JOptionPane.ERROR_MESSAGE);
+            perbaruiKeranjang();
+            muatProduk();                                 // supaya stok terbaru kelihatan
+        } catch (ValidasiException ex) {
+            Tema.peringatan(this, ex.getMessage());
         }
-    }
-
-    private void tampilkanStruk(Transaksi t) {
-        String garis = "------------------------------------------\n";
-        StringBuilder sb = new StringBuilder();
-        sb.append("                 TIRIZ\n");
-        sb.append("  Your day with peace, love, and TIRIZ\n");
-        sb.append(garis);
-        sb.append("No Transaksi : ").append(t.getIdTransaksi()).append('\n');
-        sb.append("Tanggal      : ")
-                .append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm"))).append('\n');
-        sb.append("Kasir        : ").append(Sesi.getPenggunaAktif().getNamaLengkap()).append('\n');
-        sb.append("Metode       : ").append(t.getMetodePembayaran()).append('\n');
-        sb.append(garis);
-        for (DetailTransaksi d : t.getDaftarDetail()) {
-            sb.append(d.getProduk().getNamaTampil()).append('\n');
-            sb.append("  ").append(d.getJumlah()).append(" x ")
-                    .append(FormatRupiah.format(d.getHargaSatuan())).append(" = ")
-                    .append(FormatRupiah.format(d.getSubtotal())).append('\n');
-            if (d.getCatatan() != null && !d.getCatatan().isEmpty()) {
-                sb.append("  * ").append(d.getCatatan()).append('\n');
-            }
-        }
-        sb.append(garis);
-        sb.append(String.format("%-12s: %s%n", "Total", FormatRupiah.format(t.getTotal())));
-        sb.append(String.format("%-12s: %s%n", "Bayar", FormatRupiah.format(t.getBayar())));
-        sb.append(String.format("%-12s: %s%n", "Kembalian", FormatRupiah.format(t.getKembalian())));
-        sb.append(garis);
-        sb.append("Status pesanan: Belum diserahkan\n");
-        sb.append("(ubah jadi Selesai di menu Riwayat Transaksi)\n");
-
-        JTextArea area = new JTextArea(sb.toString());
-        area.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        area.setEditable(false);
-        JOptionPane.showMessageDialog(this, area, "Struk Transaksi", JOptionPane.PLAIN_MESSAGE);
     }
 
     private void aturPembayaran() {
         boolean tunai = "Tunai".equals(cmbMetode.getSelectedItem());
         txtUangBayar.setEnabled(tunai);
-        if (tunai) {
-            txtUangBayar.setText("");
-        } else {
-            txtUangBayar.setText(keranjangModel.hitungTotal().toBigInteger().toString());
-        }
-    }
-
-    private void perbaruiTotal() {
-        BigDecimal total = keranjangModel.hitungTotal();
-        txtTotal.setText(FormatRupiah.format(total));
-        if (!"Tunai".equals(cmbMetode.getSelectedItem())) {
-            txtUangBayar.setText(total.toBigInteger().toString());
-        }
+        txtUangBayar.setText(tunai ? "" : controller.total().toBigInteger().toString());
         hitungKembalian();
     }
 
     private void hitungKembalian() {
-        try {
-            BigDecimal selisih = FormatRupiah.parse(txtUangBayar.getText()).subtract(keranjangModel.hitungTotal());
-            if (selisih.signum() >= 0) {
-                txtKembalian.setText(FormatRupiah.format(selisih));
-            } else {
-                txtKembalian.setText("Kurang " + FormatRupiah.format(selisih.negate()));
-            }
-        } catch (NumberFormatException ex) {
-            txtKembalian.setText("");                    // belum ada angka
+        BigDecimal selisih = controller.selisihBayar(txtUangBayar.getText());
+        if (selisih == null) {
+            txtKembalian.setText("");
+        } else if (selisih.signum() >= 0) {
+            txtKembalian.setText(FormatRupiah.format(selisih));
+        } else {
+            txtKembalian.setText("Kurang " + FormatRupiah.format(selisih.negate()));
         }
     }
 
-    // ---------------- helper ----------------
+    // ---------------- helper ---------------- //
 
-    private void muatProduk(String keyword) {
+    /** gambar ulang tabel keranjang dan total dari isi keranjang di controller. */
+    private void perbaruiKeranjang() {
+        modelKeranjang.setRowCount(0);
+        for (DetailTransaksi d : controller.getKeranjang()) {
+            modelKeranjang.addRow(new Object[]{d.getProduk().getNamaTampil(), d.getJumlah(),
+                FormatRupiah.format(d.getHargaSatuan()), FormatRupiah.format(d.getSubtotal()),
+                d.getCatatan() == null ? "" : d.getCatatan()});
+        }
+        Tema.sesuaikanTinggi(tblKeranjang, 4);
+        txtTotal.setText(FormatRupiah.format(controller.total()));
+        aturPembayaran();
+    }
+
+    private void muatProduk() {
         try {
-            produkModel.setData(produkDAO.ambilUntukJual(keyword));
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Gagal memuat produk:\n" + ex.getMessage(),
-                    "Error Database", JOptionPane.ERROR_MESSAGE);
+            daftarProduk = controller.cariProduk(txtCari.getText());
+        } catch (ValidasiException ex) {
+            Tema.error(this, ex.getMessage());
+            return;
+        }
+        modelProduk.setRowCount(0);
+        for (Produk p : daftarProduk) {
+            modelProduk.addRow(new Object[]{p.getIdProduk(), p.getKodeProduk(), p.getNamaProduk(), p.getKategori(),
+                p.getUkuran() == null ? "-" : p.getUkuran(), FormatRupiah.format(p.getHarga()), p.getStok(),
+                p.getStokMinimum(), p.isStokMenipis() ? "Menipis" : "Aman"});
         }
     }
 
     private void muatTopping() {
-    try {
         List<String> nama = new ArrayList<>();
         nama.add(TANPA_TOPPING);
-        for (Produk p : produkDAO.ambilTopping()) {
-            nama.add(p.getNamaProduk());
+        try {
+            nama.addAll(controller.muatTopping());
+        } catch (ValidasiException ex) {
+            Tema.error(this, ex.getMessage());
         }
         cmbTopping1.setModel(new DefaultComboBoxModel<>(nama.toArray(new String[0])));
-    } catch (SQLException ex) {
-        JOptionPane.showMessageDialog(this, "Gagal memuat topping:\n" + ex.getMessage(),
-                "Error Database", JOptionPane.ERROR_MESSAGE);
+        cmbTopping2.setModel(new DefaultComboBoxModel<>(nama.toArray(new String[0])));
     }
-}
-
-    private void aturTopping() {
-    Produk p = produkTerpilih();
-    boolean minuman = p != null && "Minuman".equals(p.getKategori());
-    cmbTopping1.setEnabled(minuman);
-    btnTambahTopping.setEnabled(minuman && !cmbTopping1.isVisible());
-    if (!minuman) {
-        cmbTopping1.setSelectedIndex(0);
-        cmbTopping1.setVisible(false);
-    }
-}
-
-private void resetInputBarang() {
-    spnJumlah.setValue(1);
-    cmbTopping1.setSelectedIndex(0);
-    cmbTopping1.setVisible(false);
-    txtCatatan.setText("");
-    aturTopping();
-}
 
     private Produk produkTerpilih() {
         int baris = tblProduk.getSelectedRow();
-        if (baris < 0) {
-            return null;
-        }
-        return produkModel.getAt(tblProduk.convertRowIndexToModel(baris));
+        return baris < 0 ? null : daftarProduk.get(baris);
     }
 
     private void kembali() {
-        if (keranjangModel.getRowCount() > 0) {
-            int pilihan = JOptionPane.showConfirmDialog(this,
-                    "Keranjang belum disimpan dan akan hilang. Tetap kembali?",
-                    "Konfirmasi", JOptionPane.YES_NO_OPTION);
-            if (pilihan != JOptionPane.YES_OPTION) {
-                return;
-            }
+        if (!controller.getKeranjang().isEmpty()
+                && !Tema.konfirmasi(this, "Keranjang belum disimpan dan akan hilang. Tetap kembali?")) {
+            return;
         }
         new FormMenuUtama().setVisible(true);
         dispose();
-    }
-
-    private void peringatan(String pesan) {
-        JOptionPane.showMessageDialog(this, pesan, "Peringatan", JOptionPane.WARNING_MESSAGE);
     }
 
     @SuppressWarnings("unchecked")
@@ -365,16 +251,18 @@ private void resetInputBarang() {
         btnCari = new javax.swing.JButton();
         spProduk = new javax.swing.JScrollPane();
         tblProduk = new javax.swing.JTable();
+        pnlInput = new javax.swing.JPanel();
         lblJumlah = new javax.swing.JLabel();
         spnJumlah = new javax.swing.JSpinner();
-        lblTopping = new javax.swing.JLabel();
+        lblTopping1 = new javax.swing.JLabel();
         cmbTopping1 = new javax.swing.JComboBox<>();
-        btnTambahTopping = new javax.swing.JButton();
+        lblTopping2 = new javax.swing.JLabel();
         cmbTopping2 = new javax.swing.JComboBox<>();
         lblCatatan = new javax.swing.JLabel();
         txtCatatan = new javax.swing.JTextField();
         btnTambahKeranjang = new javax.swing.JButton();
         pnlKeranjang = new javax.swing.JPanel();
+        lblKeranjang = new javax.swing.JLabel();
         spKeranjang = new javax.swing.JScrollPane();
         tblKeranjang = new javax.swing.JTable();
         btnHapusItem = new javax.swing.JButton();
@@ -395,42 +283,45 @@ private void resetInputBarang() {
         setResizable(false);
 
         pnlUtama.setBackground(new java.awt.Color(255, 255, 255));
-        pnlUtama.setPreferredSize(new java.awt.Dimension(1280, 680));
+        pnlUtama.setPreferredSize(new java.awt.Dimension(1280, 640));
         pnlUtama.setLayout(null);
 
         lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/logo_kecil.png"))); // NOI18N
+
         pnlUtama.add(lblLogo);
-        lblLogo.setBounds(10, 10, 150, 42);
+        lblLogo.setBounds(24, 16, 150, 42);
 
-        lblCari.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblCari.setText("Cari (Kode/Nama) :");
+        lblCari.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        lblCari.setForeground(new java.awt.Color(31, 61, 43));
+        lblCari.setText("Cari (Kode/Nama):"); // NOI18N
+
         pnlUtama.add(lblCari);
-        lblCari.setBounds(20, 60, 140, 22);
+        lblCari.setBounds(24, 70, 150, 36);
 
-        txtCari.setBackground(new java.awt.Color(200, 224, 200));
-        txtCari.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        txtCari.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtCariActionPerformed(evt);
-            }
-        });
+        txtCari.setBackground(new java.awt.Color(255, 255, 255));
+        txtCari.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        txtCari.setForeground(new java.awt.Color(31, 61, 43));
+
         pnlUtama.add(txtCari);
-        txtCari.setBounds(170, 60, 370, 27);
+        txtCari.setBounds(180, 70, 372, 36);
 
-        btnCari.setBackground(new java.awt.Color(143, 188, 143));
-        btnCari.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnCari.setBackground(new java.awt.Color(46, 139, 87));
+        btnCari.setFont(new java.awt.Font("Poppins Medium", 0, 14)); // NOI18N
         btnCari.setForeground(new java.awt.Color(255, 255, 255));
-        btnCari.setText("Cari");
+        btnCari.setText("Cari"); // NOI18N
         btnCari.setBorderPainted(false);
         btnCari.setFocusPainted(false);
         btnCari.setOpaque(true);
-        pnlUtama.add(btnCari);
-        btnCari.setBounds(560, 60, 72, 27);
 
-        tblProduk.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        pnlUtama.add(btnCari);
+        btnCari.setBounds(564, 70, 100, 36);
+
+
+        tblProduk.setFont(new java.awt.Font("Poppins", 0, 13)); // NOI18N
+        tblProduk.setRowHeight(30);
+        tblProduk.setFillsViewportHeight(true);
         tblProduk.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null, null},
@@ -441,78 +332,102 @@ private void resetInputBarang() {
                 "ID", "Kode", "Nama", "Kategori", "Ukuran", "Harga", "Stok", "Stok Min", "Status"
             }
         ));
-        tblProduk.setRowHeight(26);
+
         spProduk.setViewportView(tblProduk);
 
         pnlUtama.add(spProduk);
-        spProduk.setBounds(10, 100, 650, 140);
+        spProduk.setBounds(24, 120, 640, 240);
 
-        lblJumlah.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblJumlah.setText("Jumlah:");
-        pnlUtama.add(lblJumlah);
-        lblJumlah.setBounds(10, 250, 52, 22);
+        pnlInput.setBackground(new java.awt.Color(240, 255, 240));
+        pnlInput.setLayout(null);
 
-        spnJumlah.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        pnlUtama.add(spnJumlah);
-        spnJumlah.setBounds(70, 250, 64, 27);
+        lblJumlah.setFont(new java.awt.Font("Poppins Medium", 0, 13)); // NOI18N
+        lblJumlah.setForeground(new java.awt.Color(31, 61, 43));
+        lblJumlah.setText("Jumlah"); // NOI18N
 
-        lblTopping.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblTopping.setText("Topping:");
-        pnlUtama.add(lblTopping);
-        lblTopping.setBounds(160, 250, 70, 22);
+        pnlInput.add(lblJumlah);
+        lblJumlah.setBounds(16, 12, 120, 24);
 
-        cmbTopping1.setBackground(new java.awt.Color(200, 224, 200));
-        cmbTopping1.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        pnlUtama.add(cmbTopping1);
-        cmbTopping1.setBounds(240, 250, 280, 27);
+        spnJumlah.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        spnJumlah.setModel(new javax.swing.SpinnerNumberModel(1, 1, 999, 1));
 
-        btnTambahTopping.setBackground(new java.awt.Color(143, 188, 143));
-        btnTambahTopping.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btnTambahTopping.setForeground(new java.awt.Color(255, 255, 255));
-        btnTambahTopping.setText("+ Topping");
-        btnTambahTopping.setBorderPainted(false);
-        btnTambahTopping.setFocusPainted(false);
-        btnTambahTopping.setOpaque(true);
-        pnlUtama.add(btnTambahTopping);
-        btnTambahTopping.setBounds(540, 270, 110, 27);
+        pnlInput.add(spnJumlah);
+        spnJumlah.setBounds(16, 40, 120, 36);
 
-        cmbTopping2.setBackground(new java.awt.Color(200, 224, 200));
-        cmbTopping2.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        cmbTopping2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmbTopping2ActionPerformed(evt);
-            }
-        });
-        pnlUtama.add(cmbTopping2);
-        cmbTopping2.setBounds(240, 290, 280, 27);
+        lblTopping1.setFont(new java.awt.Font("Poppins Medium", 0, 13)); // NOI18N
+        lblTopping1.setForeground(new java.awt.Color(31, 61, 43));
+        lblTopping1.setText("Topping 1"); // NOI18N
 
-        lblCatatan.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblCatatan.setText("Catatan:");
-        pnlUtama.add(lblCatatan);
-        lblCatatan.setBounds(20, 360, 70, 22);
+        pnlInput.add(lblTopping1);
+        lblTopping1.setBounds(152, 12, 228, 24);
 
-        txtCatatan.setBackground(new java.awt.Color(200, 224, 200));
-        txtCatatan.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        pnlUtama.add(txtCatatan);
-        txtCatatan.setBounds(90, 360, 560, 27);
+        cmbTopping1.setBackground(new java.awt.Color(255, 255, 255));
+        cmbTopping1.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        cmbTopping1.setForeground(new java.awt.Color(31, 61, 43));
+        cmbTopping1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "(Tanpa topping)" }));
 
-        btnTambahKeranjang.setBackground(new java.awt.Color(60, 179, 113));
-        btnTambahKeranjang.setFont(new java.awt.Font("Segoe UI", 1, 17)); // NOI18N
+        pnlInput.add(cmbTopping1);
+        cmbTopping1.setBounds(152, 40, 228, 36);
+
+        lblTopping2.setFont(new java.awt.Font("Poppins Medium", 0, 13)); // NOI18N
+        lblTopping2.setForeground(new java.awt.Color(31, 61, 43));
+        lblTopping2.setText("Topping 2"); // NOI18N
+
+        pnlInput.add(lblTopping2);
+        lblTopping2.setBounds(396, 12, 228, 24);
+
+        cmbTopping2.setBackground(new java.awt.Color(255, 255, 255));
+        cmbTopping2.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        cmbTopping2.setForeground(new java.awt.Color(31, 61, 43));
+        cmbTopping2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "(Tanpa topping)" }));
+
+        pnlInput.add(cmbTopping2);
+        cmbTopping2.setBounds(396, 40, 228, 36);
+
+        lblCatatan.setFont(new java.awt.Font("Poppins Medium", 0, 13)); // NOI18N
+        lblCatatan.setForeground(new java.awt.Color(31, 61, 43));
+        lblCatatan.setText("Catatan (opsional)"); // NOI18N
+
+        pnlInput.add(lblCatatan);
+        lblCatatan.setBounds(16, 92, 300, 24);
+
+        txtCatatan.setBackground(new java.awt.Color(255, 255, 255));
+        txtCatatan.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        txtCatatan.setForeground(new java.awt.Color(31, 61, 43));
+
+        pnlInput.add(txtCatatan);
+        txtCatatan.setBounds(16, 120, 608, 36);
+
+        btnTambahKeranjang.setBackground(new java.awt.Color(46, 139, 87));
+        btnTambahKeranjang.setFont(new java.awt.Font("Poppins Medium", 0, 16)); // NOI18N
         btnTambahKeranjang.setForeground(new java.awt.Color(255, 255, 255));
-        btnTambahKeranjang.setText("Tambah Ke Keranjang");
+        btnTambahKeranjang.setText("Tambah Ke Keranjang"); // NOI18N
         btnTambahKeranjang.setBorderPainted(false);
         btnTambahKeranjang.setFocusPainted(false);
         btnTambahKeranjang.setOpaque(true);
-        pnlUtama.add(btnTambahKeranjang);
-        btnTambahKeranjang.setBounds(230, 440, 206, 31);
+
+        pnlInput.add(btnTambahKeranjang);
+        btnTambahKeranjang.setBounds(16, 176, 608, 48);
+
+        pnlUtama.add(pnlInput);
+        pnlInput.setBounds(24, 376, 640, 240);
 
         pnlKeranjang.setBackground(new java.awt.Color(240, 255, 240));
         pnlKeranjang.setLayout(null);
 
-        tblKeranjang.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        lblKeranjang.setFont(new java.awt.Font("Poppins", 1, 18)); // NOI18N
+        lblKeranjang.setForeground(new java.awt.Color(46, 139, 87));
+        lblKeranjang.setText("Keranjang"); // NOI18N
+
+        pnlKeranjang.add(lblKeranjang);
+        lblKeranjang.setBounds(16, 12, 300, 32);
+
+
+        tblKeranjang.setFont(new java.awt.Font("Poppins", 0, 13)); // NOI18N
+        tblKeranjang.setRowHeight(30);
+        tblKeranjang.setFillsViewportHeight(true);
         tblKeranjang.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
                 {null, null, null, null, null},
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -523,116 +438,122 @@ private void resetInputBarang() {
                 "Nama", "Jumlah", "Harga", "Subtotal", "Catatan"
             }
         ));
-        tblKeranjang.setRowHeight(26);
+
         spKeranjang.setViewportView(tblKeranjang);
 
         pnlKeranjang.add(spKeranjang);
-        spKeranjang.setBounds(30, 20, 490, 150);
+        spKeranjang.setBounds(16, 52, 536, 196);
 
-        btnHapusItem.setBackground(new java.awt.Color(143, 188, 143));
-        btnHapusItem.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnHapusItem.setBackground(new java.awt.Color(192, 57, 43));
+        btnHapusItem.setFont(new java.awt.Font("Poppins Medium", 0, 13)); // NOI18N
         btnHapusItem.setForeground(new java.awt.Color(255, 255, 255));
-        btnHapusItem.setText("Hapus Item");
+        btnHapusItem.setText("Hapus Item"); // NOI18N
         btnHapusItem.setBorderPainted(false);
         btnHapusItem.setFocusPainted(false);
         btnHapusItem.setOpaque(true);
-        pnlKeranjang.add(btnHapusItem);
-        btnHapusItem.setBounds(40, 190, 130, 27);
 
-        btnKosongkan.setBackground(new java.awt.Color(143, 188, 143));
-        btnKosongkan.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        btnKosongkan.setForeground(new java.awt.Color(255, 255, 255));
-        btnKosongkan.setText("Kosongkan");
+        pnlKeranjang.add(btnHapusItem);
+        btnHapusItem.setBounds(16, 260, 128, 36);
+
+        btnKosongkan.setBackground(new java.awt.Color(207, 229, 207));
+        btnKosongkan.setFont(new java.awt.Font("Poppins Medium", 0, 13)); // NOI18N
+        btnKosongkan.setForeground(new java.awt.Color(46, 139, 87));
+        btnKosongkan.setText("Kosongkan"); // NOI18N
         btnKosongkan.setBorderPainted(false);
         btnKosongkan.setFocusPainted(false);
         btnKosongkan.setOpaque(true);
+
         pnlKeranjang.add(btnKosongkan);
-        btnKosongkan.setBounds(190, 190, 130, 27);
+        btnKosongkan.setBounds(156, 260, 128, 36);
 
-        lblTotal.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblTotal.setText("Total");
+        lblTotal.setFont(new java.awt.Font("Poppins Medium", 0, 14)); // NOI18N
+        lblTotal.setForeground(new java.awt.Color(31, 61, 43));
+        lblTotal.setText("Total"); // NOI18N
+
         pnlKeranjang.add(lblTotal);
-        lblTotal.setBounds(40, 250, 60, 22);
+        lblTotal.setBounds(16, 316, 160, 36);
 
+        txtTotal.setBackground(new java.awt.Color(255, 255, 255));
+        txtTotal.setFont(new java.awt.Font("Poppins", 0, 15)); // NOI18N
+        txtTotal.setForeground(new java.awt.Color(31, 61, 43));
         txtTotal.setEditable(false);
-        txtTotal.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        txtTotal.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtTotalActionPerformed(evt);
-            }
-        });
+
         pnlKeranjang.add(txtTotal);
-        txtTotal.setBounds(200, 250, 320, 28);
+        txtTotal.setBounds(184, 316, 368, 36);
 
-        lblMetode.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblMetode.setText("Metode Pembayaran");
+        lblMetode.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        lblMetode.setForeground(new java.awt.Color(31, 61, 43));
+        lblMetode.setText("Metode Pembayaran"); // NOI18N
+
         pnlKeranjang.add(lblMetode);
-        lblMetode.setBounds(40, 300, 150, 22);
+        lblMetode.setBounds(16, 364, 160, 36);
 
-        cmbMetode.setBackground(new java.awt.Color(200, 224, 200));
-        cmbMetode.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        cmbMetode.setBackground(new java.awt.Color(255, 255, 255));
+        cmbMetode.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        cmbMetode.setForeground(new java.awt.Color(31, 61, 43));
+        cmbMetode.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tunai", "QRIS", "Transfer" }));
+
         pnlKeranjang.add(cmbMetode);
-        cmbMetode.setBounds(200, 300, 320, 27);
+        cmbMetode.setBounds(184, 364, 368, 36);
 
-        lblUangBayar.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblUangBayar.setText("Uang Bayar");
+        lblUangBayar.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        lblUangBayar.setForeground(new java.awt.Color(31, 61, 43));
+        lblUangBayar.setText("Uang Bayar"); // NOI18N
+
         pnlKeranjang.add(lblUangBayar);
-        lblUangBayar.setBounds(40, 350, 80, 22);
+        lblUangBayar.setBounds(16, 412, 160, 36);
 
-        txtUangBayar.setBackground(new java.awt.Color(200, 224, 200));
-        txtUangBayar.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        txtUangBayar.setBackground(new java.awt.Color(255, 255, 255));
+        txtUangBayar.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        txtUangBayar.setForeground(new java.awt.Color(31, 61, 43));
+
         pnlKeranjang.add(txtUangBayar);
-        txtUangBayar.setBounds(200, 350, 320, 28);
+        txtUangBayar.setBounds(184, 412, 368, 36);
 
-        lblKembalian.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lblKembalian.setText("Kembalian");
+        lblKembalian.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        lblKembalian.setForeground(new java.awt.Color(31, 61, 43));
+        lblKembalian.setText("Kembalian"); // NOI18N
+
         pnlKeranjang.add(lblKembalian);
-        lblKembalian.setBounds(40, 400, 90, 22);
+        lblKembalian.setBounds(16, 460, 160, 36);
 
+        txtKembalian.setBackground(new java.awt.Color(255, 255, 255));
+        txtKembalian.setFont(new java.awt.Font("Poppins", 0, 14)); // NOI18N
+        txtKembalian.setForeground(new java.awt.Color(31, 61, 43));
         txtKembalian.setEditable(false);
-        txtKembalian.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        pnlKeranjang.add(txtKembalian);
-        txtKembalian.setBounds(200, 400, 320, 28);
 
-        btnCetak.setBackground(new java.awt.Color(60, 179, 113));
-        btnCetak.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        pnlKeranjang.add(txtKembalian);
+        txtKembalian.setBounds(184, 460, 368, 36);
+
+        btnCetak.setBackground(new java.awt.Color(46, 139, 87));
+        btnCetak.setFont(new java.awt.Font("Poppins Medium", 0, 16)); // NOI18N
         btnCetak.setForeground(new java.awt.Color(255, 255, 255));
-        btnCetak.setText("Cetak Transaksi");
+        btnCetak.setText("Cetak Transaksi"); // NOI18N
         btnCetak.setBorderPainted(false);
         btnCetak.setFocusPainted(false);
         btnCetak.setOpaque(true);
-        pnlKeranjang.add(btnCetak);
-        btnCetak.setBounds(50, 460, 330, 32);
 
-        btnKembali.setBackground(new java.awt.Color(143, 188, 143));
-        btnKembali.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        btnKembali.setForeground(new java.awt.Color(255, 255, 255));
-        btnKembali.setText("Kembali");
+        pnlKeranjang.add(btnCetak);
+        btnCetak.setBounds(16, 520, 368, 52);
+
+        btnKembali.setBackground(new java.awt.Color(207, 229, 207));
+        btnKembali.setFont(new java.awt.Font("Poppins Medium", 0, 16)); // NOI18N
+        btnKembali.setForeground(new java.awt.Color(46, 139, 87));
+        btnKembali.setText("Kembali"); // NOI18N
         btnKembali.setBorderPainted(false);
         btnKembali.setFocusPainted(false);
         btnKembali.setOpaque(true);
+
         pnlKeranjang.add(btnKembali);
-        btnKembali.setBounds(420, 460, 93, 29);
+        btnKembali.setBounds(396, 520, 156, 52);
 
         pnlUtama.add(pnlKeranjang);
-        pnlKeranjang.setBounds(670, 10, 590, 620);
+        pnlKeranjang.setBounds(688, 16, 568, 600);
 
         getContentPane().add(pnlUtama, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void txtCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCariActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtCariActionPerformed
-
-    private void cmbTopping2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbTopping2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cmbTopping2ActionPerformed
-
-    private void txtTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTotalActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtTotalActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCari;
@@ -641,7 +562,6 @@ private void resetInputBarang() {
     private javax.swing.JButton btnKembali;
     private javax.swing.JButton btnKosongkan;
     private javax.swing.JButton btnTambahKeranjang;
-    private javax.swing.JButton btnTambahTopping;
     private javax.swing.JComboBox<String> cmbMetode;
     private javax.swing.JComboBox<String> cmbTopping1;
     private javax.swing.JComboBox<String> cmbTopping2;
@@ -649,11 +569,14 @@ private void resetInputBarang() {
     private javax.swing.JLabel lblCatatan;
     private javax.swing.JLabel lblJumlah;
     private javax.swing.JLabel lblKembalian;
+    private javax.swing.JLabel lblKeranjang;
     private javax.swing.JLabel lblLogo;
     private javax.swing.JLabel lblMetode;
-    private javax.swing.JLabel lblTopping;
+    private javax.swing.JLabel lblTopping1;
+    private javax.swing.JLabel lblTopping2;
     private javax.swing.JLabel lblTotal;
     private javax.swing.JLabel lblUangBayar;
+    private javax.swing.JPanel pnlInput;
     private javax.swing.JPanel pnlKeranjang;
     private javax.swing.JPanel pnlUtama;
     private javax.swing.JScrollPane spKeranjang;

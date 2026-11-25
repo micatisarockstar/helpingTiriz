@@ -34,7 +34,7 @@ public class Produk {
         return stok <= stokMinimum;
     }
 
-    /** Contoh: "Matcha Original (M)" atau "Cookies Matcha". */
+    /** kek "Matcha Original (M)" atau "Cookies Matcha". */
     public String getNamaTampil() {
         if (ukuran == null || ukuran.isEmpty()) {
             return namaProduk;
