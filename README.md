@@ -160,7 +160,7 @@ Database terdiri dari empat tabel: pengguna, produk, transaksi, dan detail_trans
 | bayar | DECIMAL(12,2) | Uang dari pembeli |
 | kembalian | DECIMAL(12,2) | Bayar dikurangi total |
 | status_pesanan | ENUM(Belum, Selesai) | Status Pesanan |
-| waktu_selesai | DATETIME | saat pesanan selesai |
+| waktu_selesai | DATETIME | Saat pesanan selesai |
 | id_pengguna | INT | Foreign key ke pengguna (kasir yang melayani) |
 
 #### Tabel detail_transaksi
